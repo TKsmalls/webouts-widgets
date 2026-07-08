@@ -1,1 +1,1 @@
-# -webouts-widgets
+# webouts-widgets
