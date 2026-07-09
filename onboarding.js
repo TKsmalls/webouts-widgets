@@ -12,7 +12,7 @@
   #wo-onb .sec{border:1px solid #e6e6e6;border-left:6px solid #07378C;border-radius:10px;padding:16px 18px;margin:0 0 16px;background:#fff}
   #wo-onb .sec h2{color:#07378C;font-size:16px;margin:0 0 12px}
   #wo-onb .fld{margin:0 0 14px}
-  #wo-onb label{display:block;font-weight:600;font-size:14px;margin:0 0 4px}
+  #wo-onb label{display:block;font-weight:600;font-size:14px;margin:0 0 4px;color:#E26337}
   #wo-onb .help{color:#6b7280;font-size:12px;margin:0 0 6px}
   #wo-onb input[type=text],#wo-onb input[type=email],#wo-onb input[type=tel],#wo-onb textarea{
     width:100%;box-sizing:border-box;border:1px solid #d1d5db;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit}
@@ -22,7 +22,7 @@
   #wo-onb .row>.fld{flex:1;min-width:200px}
   #wo-onb .colorwrap{display:flex;gap:8px;align-items:center}
   #wo-onb input[type=color]{width:44px;height:38px;border:1px solid #d1d5db;border-radius:8px;background:#fff;padding:2px}
-  #wo-onb .langs label{display:inline-flex;align-items:center;gap:6px;font-weight:400;margin-right:18px}
+  #wo-onb .langs label:has(input){display:inline-flex;align-items:center;gap:6px;font-weight:400;margin-right:18px;color:#111827}
   #wo-onb .bar{position:sticky;top:0;z-index:5;background:#f6f6f6;padding:10px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid #e6e6e6;margin-bottom:16px}
   #wo-onb .status{font-size:13px;color:#6b7280}
   #wo-onb .status b{color:#2F8F5C}
