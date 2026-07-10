@@ -107,10 +107,14 @@
 
   /* collapsible sections */
   #wo-onb .sec h2{cursor:pointer;user-select:none}
-  #wo-onb .sec .check{margin-left:auto;flex:0 0 auto;width:22px;height:22px;border:2px solid #cdd4df;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:transparent;font-size:14px;font-weight:800;line-height:1;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
-  #wo-onb .sec .check:hover{border-color:#2F8F5C}
+  #wo-onb .sec .done-toggle{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+  #wo-onb .sec .check{flex:0 0 auto;width:22px;height:22px;border:2px solid #cdd4df;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:transparent;font-size:14px;font-weight:800;line-height:1;transition:background .15s,border-color .15s,color .15s}
+  #wo-onb .sec .done-label{font-size:12px;font-weight:600;color:#9aa4b4;letter-spacing:.2px;white-space:nowrap}
+  #wo-onb .sec .done-toggle:hover .check{border-color:#2F8F5C}
+  #wo-onb .sec .done-toggle:hover .done-label{color:#2F8F5C}
   #wo-onb .sec.filled .check{background:#2F8F5C;border-color:#2F8F5C;color:#fff}
-  #wo-onb .sec .chev{margin-left:auto;width:9px;height:9px;border-right:2px solid #9aa4b4;border-bottom:2px solid #9aa4b4;transform:rotate(-45deg);transition:transform .2s ease;flex:0 0 auto;margin-top:-3px}
+  #wo-onb .sec.filled .done-label{color:#2F8F5C}
+  #wo-onb .sec .chev{width:9px;height:9px;border-right:2px solid #9aa4b4;border-bottom:2px solid #9aa4b4;transform:rotate(-45deg);transition:transform .2s ease;flex:0 0 auto;margin-top:-3px}
   #wo-onb .sec.open .chev{transform:rotate(45deg)}
   #wo-onb .sec:not(.open) .intro,#wo-onb .sec:not(.open) .secbody{display:none}
   #wo-onb .sec:not(.open) h2{margin-bottom:0}
@@ -429,8 +433,8 @@
   secs.forEach(function (sec, i) {
     sec.setAttribute('data-sec', SEC_SLUGS[i] || ('s' + i));
     var h = sec.querySelector('h2');
-    h.insertAdjacentHTML('beforeend', '<span class="check" title="Mark this section done">✓</span><span class="chev"></span>');
-    h.querySelector('.check').addEventListener('click', function (e) {
+    h.insertAdjacentHTML('beforeend', '<span class="done-toggle" title="Mark this section completed"><span class="check">✓</span><span class="done-label">Completed</span></span><span class="chev"></span>');
+    h.querySelector('.done-toggle').addEventListener('click', function (e) {
       e.stopPropagation();
       if (locked) return;
       var slug = sec.getAttribute('data-sec');
