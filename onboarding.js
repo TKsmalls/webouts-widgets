@@ -39,11 +39,11 @@
 
   var STYLE = `
   #wo-onb{max-width:720px;margin:0 auto;padding:8px 16px 72px;font-family:'Poppins',Arial,Helvetica,sans-serif;color:#1f2430;line-height:1.5}
-  #wo-onb h1{color:#07378C;font-size:27px;font-weight:800;margin:6px 0 6px;letter-spacing:-.4px}
-  #wo-onb .sub{color:#5b6472;font-size:15px;margin:0 0 22px;max-width:60ch}
+  #wo-onb h1{color:#07378C;font-size:27px;font-weight:800;margin:6px 0 6px;letter-spacing:-.4px;text-align:center}
+  #wo-onb .sub{color:#5b6472;font-size:15px;margin:0 auto 22px;max-width:60ch;text-align:center}
 
   /* resume card (save state + private link) */
-  #wo-onb .bar{position:sticky;top:0;z-index:5;background:#fff;border:1px solid #e3e7ee;border-radius:12px;box-shadow:0 4px 16px rgba(7,55,140,.08);padding:12px 14px;margin:0 0 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  #wo-onb .bar{position:sticky;top:0;z-index:5;background:#fff;border:2px solid #E26337;border-radius:12px;box-shadow:0 4px 16px rgba(226,99,55,.15);padding:12px 14px;margin:0 0 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   #wo-onb .save{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#4b5563;white-space:nowrap}
   #wo-onb .dot{width:9px;height:9px;border-radius:50%;background:#9ca3af;flex:0 0 auto}
   #wo-onb .dot.saved{background:#2F8F5C;box-shadow:0 0 0 3px rgba(47,143,92,.18)}
@@ -107,8 +107,9 @@
 
   /* collapsible sections */
   #wo-onb .sec h2{cursor:pointer;user-select:none}
-  #wo-onb .sec .check{display:none;margin-left:auto;color:#2F8F5C;font-weight:800;font-size:15px}
-  #wo-onb .sec.filled .check{display:inline-block}
+  #wo-onb .sec .check{margin-left:auto;flex:0 0 auto;width:22px;height:22px;border:2px solid #cdd4df;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:transparent;font-size:14px;font-weight:800;line-height:1;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+  #wo-onb .sec .check:hover{border-color:#2F8F5C}
+  #wo-onb .sec.filled .check{background:#2F8F5C;border-color:#2F8F5C;color:#fff}
   #wo-onb .sec .chev{margin-left:auto;width:9px;height:9px;border-right:2px solid #9aa4b4;border-bottom:2px solid #9aa4b4;transform:rotate(-45deg);transition:transform .2s ease;flex:0 0 auto;margin-top:-3px}
   #wo-onb .sec.open .chev{transform:rotate(45deg)}
   #wo-onb .sec:not(.open) .intro,#wo-onb .sec:not(.open) .secbody{display:none}
@@ -292,7 +293,7 @@
       .catch(function () { setSave('error', 'Couldn’t save, check your connection'); })
       .finally(function () { saving = false; if (pending) { pending = false; doSave(); } });
   }
-  function queueSave() { if (locked) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); updateChecks(); saveTimer = setTimeout(doSave, 1200); }
+  function queueSave() { if (locked) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
 
   // ---- generic auto-expanding table (rows -> " | "-joined lines in a hidden input) ----
   function tableCtl(cfg, bodyEl, valEl) {
@@ -343,7 +344,7 @@
       var last = rows[rows.length - 1];
       if (last && rowEmpty(last)) bodyEl.removeChild(last);
       rowsVals.forEach(function (v) { bodyEl.appendChild(row(v)); });
-      ensureBlank(); serialize(); doSave(); updateChecks();
+      ensureBlank(); serialize(); doSave();
     }
     return { build: build, addRows: addRows };
   }
@@ -384,7 +385,6 @@
           : '<span class="st err">' + esc(e.msg || 'failed') + '</span>';
         return '<li><span>' + esc(e.name) + '</span>' + lbl + '</li>';
       }).join('');
-      updateChecks();
     }
     function persist() {
       var names = items.filter(function (e) { return e.st === 'ok'; }).map(function (e) { return e.name; });
@@ -422,11 +422,21 @@
   var gfxUp = uploadCtl('graphics', 'graphics.files', 'gfx');
   var brandUp = uploadCtl('brand', 'brandGuide.files', 'brand');
 
-  // ---- collapsible sections + completion checks ----
+  // ---- collapsible sections + user-clickable "done" checks ----
+  var SEC_SLUGS = ['org', 'people', 'providers', 'filming', 'look', 'brand', 'misc'];
   var secs = Array.prototype.slice.call(root.querySelectorAll('#wo-form > .sec'));
-  secs.forEach(function (sec) {
+  var doneSecs = {};
+  secs.forEach(function (sec, i) {
+    sec.setAttribute('data-sec', SEC_SLUGS[i] || ('s' + i));
     var h = sec.querySelector('h2');
-    h.insertAdjacentHTML('beforeend', '<span class="check">✓</span><span class="chev"></span>');
+    h.insertAdjacentHTML('beforeend', '<span class="check" title="Mark this section done">✓</span><span class="chev"></span>');
+    h.querySelector('.check').addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (locked) return;
+      var slug = sec.getAttribute('data-sec');
+      if (sec.classList.toggle('filled')) doneSecs[slug] = 1; else delete doneSecs[slug];
+      doSave({ _done: Object.keys(doneSecs).join(',') });
+    });
     h.addEventListener('click', function () {
       var wasOpen = sec.classList.contains('open');
       secs.forEach(function (s) { s.classList.remove('open'); });
@@ -434,13 +444,11 @@
     });
   });
   if (secs[0]) secs[0].classList.add('open');
-  function sectionFilled(sec) {
-    var any = false;
-    Array.prototype.forEach.call(sec.querySelectorAll('[data-key]'), function (el) { if (el.value && el.value.trim()) any = true; });
-    if (sec.querySelector('.files li')) any = true;
-    return any;
+  function applyDone(str) {
+    doneSecs = {};
+    String(str || '').split(',').filter(Boolean).forEach(function (slug) { doneSecs[slug] = 1; });
+    secs.forEach(function (sec) { sec.classList.toggle('filled', !!doneSecs[sec.getAttribute('data-sec')]); });
   }
-  function updateChecks() { secs.forEach(function (sec) { sec.classList.toggle('filled', sectionFilled(sec)); }); }
 
   // ---- provider bulk paste (Excel / Sheets -> table rows) ----
   var provPasteWrap = document.getElementById('wo-prov-paste');
@@ -501,7 +509,7 @@
       Object.keys(TABLES).forEach(function (id) { tableCtls[id].build(data[TABLES[id].key] || ''); });
       gfxUp.load(data['graphics.files']);
       brandUp.load(data['brandGuide.files']);
-      updateChecks();
+      applyDone(data._done);
       lockIfNeeded(data._stage);
       var has = Object.keys(data).length > 0;
       setSave('idle', locked ? 'Locked' : (has ? 'All changes saved' : 'Ready to start typing'));
