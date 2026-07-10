@@ -57,7 +57,7 @@
 
   /* sections */
   #wo-onb .sec{border:1px solid #e6e9ef;border-radius:12px;padding:20px 22px;margin:0 0 14px;background:#fff}
-  #wo-onb .sec h2{display:flex;align-items:center;gap:11px;color:#07378C;font-size:17px;font-weight:700;margin:0 0 4px}
+  #wo-onb .sec h2{display:flex;align-items:center;gap:11px;color:#07378C;font-size:17px;font-weight:700;margin:0 0 4px;width:100%;max-width:none;box-sizing:border-box}
   #wo-onb .num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#07378C;color:#fff;font-size:13px;font-weight:700;flex:0 0 auto}
   #wo-onb .intro{color:#5b6472;font-size:13.5px;margin:0 0 16px 37px}
   #wo-onb .secbody{margin-top:16px}
