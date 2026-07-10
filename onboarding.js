@@ -82,7 +82,7 @@
 
       <div class="sec">
         <h2>Providers for launch</h2>
-        <div class="fld"><label>Provider list</label><div class="help">Everyone you’d like featured. Include a few extra beyond your target number so we can cover scheduling conflicts. One per line — name and specialty (e.g. “Dr. Sam Okafor — Cardiology”).</div><textarea data-key="providers.launchList" placeholder="Dr. Name — Specialty"></textarea></div>
+        <div class="fld"><label>Provider list</label><div class="help">Include about <strong>50% more providers than you’re targeting</strong> for your first round — the extras cover scheduling conflicts. For example: targeting 16 → add 8 extra for 24 total; a full week of 40 → reach out to 60 total. One per line — name and specialty (e.g. “Dr. Sam Okafor — Cardiology”).</div><textarea data-key="providers.launchList" placeholder="Dr. Name — Specialty"></textarea></div>
       </div>
 
       <div class="sec">
