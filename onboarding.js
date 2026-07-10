@@ -103,6 +103,23 @@
   #wo-onb .locked{background:#FFF4EF;border:1px solid #f3c9bb;border-radius:11px;padding:14px 16px;color:#7a2e12;margin-bottom:18px;font-size:14px}
   #wo-onb .done{text-align:center;padding:48px 16px}
   #wo-onb .done h1{font-size:28px}
+
+  /* collapsible sections */
+  #wo-onb .sec h2{cursor:pointer;user-select:none}
+  #wo-onb .sec .check{display:none;margin-left:auto;color:#2F8F5C;font-weight:800;font-size:15px}
+  #wo-onb .sec.filled .check{display:inline-block}
+  #wo-onb .sec .chev{margin-left:auto;width:9px;height:9px;border-right:2px solid #9aa4b4;border-bottom:2px solid #9aa4b4;transform:rotate(-45deg);transition:transform .2s ease;flex:0 0 auto;margin-top:-3px}
+  #wo-onb .sec.open .chev{transform:rotate(45deg)}
+  #wo-onb .sec:not(.open) .intro,#wo-onb .sec:not(.open) .secbody{display:none}
+  #wo-onb .sec:not(.open) h2{margin-bottom:0}
+
+  /* paste from spreadsheet */
+  #wo-onb .pastebox{margin:12px 0 0}
+  #wo-onb .pastetoggle{background:#eef2fb;color:#07378C;font-weight:600;font-size:13px;padding:8px 14px}
+  #wo-onb .pastetoggle:hover{background:#e2e9f8}
+  #wo-onb .pastewrap{margin-top:12px}
+  #wo-onb .pastewrap textarea{width:100%;box-sizing:border-box;border:1px solid #d3d8e0;border-radius:9px;padding:11px 13px;font-size:13px;font-family:inherit;min-height:88px;resize:vertical}
+  #wo-onb .pasteadd{background:#07378C;color:#fff;font-size:13px;margin-top:10px}
   `;
 
   function tableHTML(id, cfg) {
@@ -123,7 +140,7 @@
     <div class="bar">
       <span class="save"><span class="dot" id="wo-dot"></span><span id="wo-stat">Loading…</span></span>
       <div class="linkwrap">
-        <span class="linklabel">Your private link (save it to return anytime)</span>
+        <span class="linklabel">Your private link — save it, or share it with your team</span>
         <span class="linkbox" id="wo-link"></span>
       </div>
       <button type="button" class="copy" id="wo-copy">Copy link</button>
@@ -131,7 +148,7 @@
     <div id="wo-lockmsg" class="locked" style="display:none">This form has been locked by the WebOuts team and is now read-only. Contact us if something needs to change.</div>
 
     <h1>Welcome! Let’s set up your profile videos</h1>
-    <p class="sub">Everything you tell us here helps us start filming. Fill in what you can. You don’t need every answer today. Your progress saves automatically, and you can share your link with teammates to help fill it in.</p>
+    <p class="sub">This is how we get ready to film your providers. It takes about 10 minutes, and you don’t need every answer today. This works best as a team effort: copy your private link above and pass it around so the right person fills in each section. Everything saves as you go, so anyone can stop and pick up later.</p>
 
     <div id="wo-form">
       <div class="sec">
@@ -156,8 +173,16 @@
       <div class="sec">
         <h2><span class="num">3</span> Providers to feature</h2>
         <div class="secbody">
-          <div class="help">List the providers you’d like to feature, and include about <strong>50% more than your first-round target</strong> so we can cover scheduling conflicts (targeting 16? list 24. A full week of 40? list 60). Start typing and a new row appears automatically.</div>
+          <div class="help">List the providers you’d like to feature, and include about <strong>50% more than your first-round target</strong> so we can cover scheduling conflicts (targeting 16? list 24. A full week of 40? list 60). Type directly, or paste your whole list from a spreadsheet.</div>
           ${tableHTML('providers', TABLES.providers)}
+          <div class="pastebox">
+            <button type="button" class="pastetoggle pasteui" id="wo-prov-paste-toggle">Paste from a spreadsheet</button>
+            <div class="pastewrap" id="wo-prov-paste" style="display:none">
+              <div class="help">Copy the name, specialty, and email columns from Excel or Google Sheets, then paste below. One provider per line — we’ll fill in the rows for you.</div>
+              <textarea class="pasteui" id="wo-prov-paste-txt" placeholder="Dr. Jane Smith, Cardiology, jane@org.com"></textarea>
+              <button type="button" class="pasteadd pasteui" id="wo-prov-paste-add">Add to table</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -272,7 +297,7 @@
       .catch(function () { setSave('error', 'Couldn’t save, check your connection'); })
       .finally(function () { saving = false; if (pending) { pending = false; doSave(); } });
   }
-  function queueSave() { if (locked) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
+  function queueSave() { if (locked) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); updateChecks(); saveTimer = setTimeout(doSave, 1200); }
 
   // ---- generic auto-expanding table (rows -> " | "-joined lines in a hidden input) ----
   function tableCtl(cfg, bodyEl, valEl) {
@@ -318,7 +343,14 @@
       else lines.forEach(function (line) { bodyEl.appendChild(row(line.split(' | '))); });
       ensureBlank(); serialize();
     }
-    return { build: build };
+    function addRows(rowsVals) {
+      var rows = bodyEl.querySelectorAll('tr');
+      var last = rows[rows.length - 1];
+      if (last && rowEmpty(last)) bodyEl.removeChild(last);
+      rowsVals.forEach(function (v) { bodyEl.appendChild(row(v)); });
+      ensureBlank(); serialize(); doSave(); updateChecks();
+    }
+    return { build: build, addRows: addRows };
   }
 
   var tableCtls = {};
@@ -357,6 +389,7 @@
           : '<span class="st err">' + esc(e.msg || 'failed') + '</span>';
         return '<li><span>' + esc(e.name) + '</span>' + lbl + '</li>';
       }).join('');
+      updateChecks();
     }
     function persist() {
       var names = items.filter(function (e) { return e.st === 'ok'; }).map(function (e) { return e.name; });
@@ -394,6 +427,43 @@
   var gfxUp = uploadCtl('graphics', 'graphics.files', 'gfx');
   var brandUp = uploadCtl('brand', 'brandGuide.files', 'brand');
 
+  // ---- collapsible sections + completion checks ----
+  var secs = Array.prototype.slice.call(root.querySelectorAll('#wo-form > .sec'));
+  secs.forEach(function (sec) {
+    var h = sec.querySelector('h2');
+    h.insertAdjacentHTML('beforeend', '<span class="check">✓</span><span class="chev"></span>');
+    h.addEventListener('click', function () {
+      var wasOpen = sec.classList.contains('open');
+      secs.forEach(function (s) { s.classList.remove('open'); });
+      if (!wasOpen) sec.classList.add('open');
+    });
+  });
+  if (secs[0]) secs[0].classList.add('open');
+  function sectionFilled(sec) {
+    var any = false;
+    Array.prototype.forEach.call(sec.querySelectorAll('[data-key]'), function (el) { if (el.value && el.value.trim()) any = true; });
+    if (sec.querySelector('.files li')) any = true;
+    return any;
+  }
+  function updateChecks() { secs.forEach(function (sec) { sec.classList.toggle('filled', sectionFilled(sec)); }); }
+
+  // ---- provider bulk paste (Excel / Sheets -> table rows) ----
+  var provPasteWrap = document.getElementById('wo-prov-paste');
+  document.getElementById('wo-prov-paste-toggle').addEventListener('click', function () {
+    provPasteWrap.style.display = provPasteWrap.style.display === 'none' ? 'block' : 'none';
+  });
+  document.getElementById('wo-prov-paste-add').addEventListener('click', function () {
+    var txt = document.getElementById('wo-prov-paste-txt');
+    var text = txt.value;
+    if (!text.trim()) return;
+    var delim = text.indexOf('\t') >= 0 ? '\t' : ',';
+    var rows = text.split(/\r?\n/).map(function (l) { return l.split(delim).map(function (c) { return c.trim(); }); })
+      .filter(function (c) { return c.some(function (x) { return x; }); });
+    if (rows.length > 1) { var head = rows[0].join(' ').toLowerCase(); if ((head.indexOf('name') >= 0 || head.indexOf('special') >= 0) && head.indexOf('@') < 0) rows.shift(); }
+    tableCtls.providers.addRows(rows);
+    txt.value = ''; provPasteWrap.style.display = 'none';
+  });
+
   fields.forEach(function (el) {
     el.addEventListener('input', queueSave);
     el.addEventListener('change', queueSave);
@@ -421,7 +491,7 @@
       locked = true;
       document.getElementById('wo-lockmsg').style.display = 'block';
       fields.forEach(function (el) { el.disabled = true; });
-      Array.prototype.forEach.call(root.querySelectorAll('.sstab input, .sstab button'), function (el) { el.disabled = true; });
+      Array.prototype.forEach.call(root.querySelectorAll('.sstab input, .sstab button, .pasteui'), function (el) { el.disabled = true; });
       gfxUp.disable(); brandUp.disable();
       document.getElementById('wo-submit').style.display = 'none';
     }
@@ -436,6 +506,7 @@
       Object.keys(TABLES).forEach(function (id) { tableCtls[id].build(data[TABLES[id].key] || ''); });
       gfxUp.load(data['graphics.files']);
       brandUp.load(data['brandGuide.files']);
+      updateChecks();
       lockIfNeeded(data._stage);
       var has = Object.keys(data).length > 0;
       setSave('idle', locked ? 'Locked' : (has ? 'All changes saved' : 'Ready to start typing'));
