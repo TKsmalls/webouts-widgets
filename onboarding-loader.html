@@ -1,4 +1,20 @@
 <!-- WebOuts Onboarding — ONE-TIME paste into a Bricks "Code" element on webouts.com/onboarding.
-     After this, all updates come from GitHub — the web team never touches this again. -->
+     This bootstrap always loads the newest published version within seconds of a push:
+     it asks GitHub for the current commit, then loads that exact (immutable) file from the CDN,
+     so there is no cache lag and no hard-refresh needed. If GitHub is unreachable it falls back
+     to the @main URL. After this, the web team never touches this again. -->
 <div id="wo-onboarding-root"></div>
-<script src="https://cdn.jsdelivr.net/gh/TKsmalls/webouts-widgets@main/onboarding.js"></script>
+<script>
+(function () {
+  var repo = 'TKsmalls/webouts-widgets', file = 'onboarding.js';
+  function inject(ref) {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/gh/' + repo + '@' + ref + '/' + file;
+    document.head.appendChild(s);
+  }
+  fetch('https://api.github.com/repos/' + repo + '/commits/main', { headers: { Accept: 'application/vnd.github.sha' } })
+    .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+    .then(function (sha) { inject(/^[0-9a-f]{40}$/.test(sha.trim()) ? sha.trim() : 'main'); })
+    .catch(function () { inject('main'); });
+})();
+</script>
