@@ -17,8 +17,9 @@
     ] },
     team: { key: 'team.list', cols: [
       { c: 'Name', ph: 'Full name' },
-      { c: 'Role', ph: 'Marketing Director' },
-      { c: 'What they handle', ph: 'Final approvals' }
+      { c: 'Title / role', ph: 'Marketing Director' },
+      { c: 'Email', ph: 'name@org.com' },
+      { c: 'Phone', ph: '(555) 555-5555' }
     ] },
     providers: { key: 'providers.launchList', cols: [
       { c: 'Provider name', ph: 'Dr. Jane Smith' },
@@ -26,13 +27,13 @@
       { c: 'Email', ph: 'jane@org.com' }
     ] },
     approvals: { key: 'approval.process', cols: [
-      { c: 'Approval step', ph: 'e.g. Reviews thumbnails' },
-      { c: 'Who is responsible (name & title)', ph: 'Name, title' }
+      { c: 'Name', ph: 'Full name' },
+      { c: 'What they review or approve', ph: 'e.g. Reviews scripts' }
     ], seed: [
-      ['Reviews scripts', ''],
-      ['Gives final approval on scripts', ''],
-      ['Reviews videos', ''],
-      ['Gives final approval on videos', '']
+      ['', 'Reviews scripts'],
+      ['', 'Gives final approval on scripts'],
+      ['', 'Reviews videos'],
+      ['', 'Gives final approval on videos']
     ] }
   };
 
@@ -154,19 +155,21 @@
       <div class="sec">
         <h2><span class="num">1</span> Your organization</h2>
         <div class="secbody">
-          <div class="fld"><label>Organization name</label><input type="text" data-key="identity.displayName" placeholder="e.g. Northwell Health"></div>
+          <div class="fld"><label>Organization name</label><input type="text" data-key="identity.displayName"></div>
           <div class="fld"><label>Website</label><input type="text" data-key="web.site" placeholder="https://…"></div>
-          <div class="fld"><label>Provider email domain(s)</label><div class="help">So we recognize your team. Separate multiple with commas.</div><input type="text" data-key="identity.emailDomains" placeholder="northwell.edu"></div>
+          <div class="fld"><label>Provider email domain(s)</label><div class="help">So we recognize your team. Separate multiple with commas.</div><input type="text" data-key="identity.emailDomains" placeholder="@healthorganization.com"></div>
         </div>
       </div>
 
       <div class="sec">
-        <h2><span class="num">2</span> Key people</h2>
-        <p class="intro">Who we’ll be working with.</p>
+        <h2><span class="num">2</span> Key people &amp; approvals</h2>
+        <p class="intro">Who we’ll be working with, and who signs off.</p>
         <div class="secbody">
           <div class="fld"><label>Main contact(s)</label><div class="help">Your day-to-day point(s) of contact. Add as many as you need.</div>${tableHTML('contacts', TABLES.contacts)}</div>
-          <div class="fld"><label>Your wider team</label><div class="help">Anyone else involved and what they handle, so we route things to the right person.</div>${tableHTML('team', TABLES.team)}</div>
-          <div class="fld"><label>Who sends the kickoff email to providers?</label><div class="help">The first announcement lands best from one of your leaders. Name and title, or tell us you’d like WebOuts to send it.</div><input type="text" data-key="rollout.leadershipSender" placeholder="e.g. Dr. Jordan Lee, Chief Medical Officer"></div>
+          <div class="fld"><label>Your wider team</label><div class="help">Anyone else involved, so we route things to the right person.</div>${tableHTML('team', TABLES.team)}</div>
+          <div class="fld"><label>Who sends the kickoff email to providers?</label><div class="help">This should come from a senior leader, ideally someone in the C-suite or the president, someone with real sway over your providers. When the ask comes from the top, providers treat it as a priority instead of a nice-to-have from marketing or communications, and participation goes way up. Give us their name and title, or tell us you’d like WebOuts to send it.</div><input type="text" data-key="rollout.leadershipSender" placeholder="e.g. Dr. Jordan Lee, Chief Medical Officer"></div>
+          <div class="fld"><label>Approvals</label><div class="help">Who signs off at each step? Add each person, and add any other checks your videos go through before they’re final.</div>${tableHTML('approvals', TABLES.approvals)}</div>
+          <div class="fld"><label>How your team works</label><div class="help">We want to understand how your team is set up so we can plug into your existing structure and serve you better. Tell us how requests get routed and anything that helps us keep things moving smoothly.</div><textarea data-key="process.details"></textarea></div>
         </div>
       </div>
 
@@ -198,7 +201,7 @@
         <h2><span class="num">5</span> Look, sound &amp; SEO</h2>
         <p class="intro">How you’d like the videos to feel. Share what you have, and we’ll fill any gaps.</p>
         <div class="secbody">
-          <div class="fld"><label>Graphics</label><div class="help">Lower-thirds, title cards, backgrounds and thumbnails. If you have editable <strong>Adobe or DaVinci Resolve</strong> project files, upload them below and we’ll use those files directly. If not, we’ll design a set from your brand guidelines.</div>${uploadHTML('gfx', 'Upload your Adobe or DaVinci Resolve project files. Something larger? Email it and we’ll add it.')}</div>
+          <div class="fld"><label>Graphics</label><div class="help">The on-screen graphics for your videos, like lower-thirds and title cards. If you have editable <strong>Adobe or DaVinci Resolve</strong> project files, upload them below and we’ll use those files directly. If not, we’ll design a set from your brand guidelines.</div>${uploadHTML('gfx', 'Upload your Adobe or DaVinci Resolve project files. Something larger? Email it and we’ll add it.')}</div>
           <div class="fld"><label>Scripting</label><div class="help">Tone and voice, any must-say or never-say, reading level, and legal or compliance notes.</div><textarea data-key="scripting.standards"></textarea></div>
           <div class="fld"><label>SEO</label><div class="help">If you follow an SEO formula for titles, descriptions or file names, paste it here, or drop in a couple of real examples from past videos. We’ll build off your exact pattern.</div><textarea data-key="seo.standards" placeholder="e.g. [Provider Name], [Specialty] | [Organization] — [City, State]"></textarea></div>
         </div>
@@ -213,15 +216,7 @@
       </div>
 
       <div class="sec">
-        <h2><span class="num">7</span> Approvals &amp; process</h2>
-        <div class="secbody">
-          <div class="fld"><label>Approvals</label><div class="help">Who signs off at each step? Fill in who’s responsible, and add any other checks your videos go through before they’re final.</div>${tableHTML('approvals', TABLES.approvals)}</div>
-          <div class="fld"><label>How your team works</label><div class="help">We want to understand how your team is set up so we can plug into your existing structure and serve you better. Tell us how requests get routed and anything that helps us keep things moving smoothly.</div><textarea data-key="process.details"></textarea></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <h2><span class="num">8</span> Anything else</h2>
+        <h2><span class="num">7</span> Anything else</h2>
         <div class="secbody">
           <div class="help">Anything else we should know that didn’t fit above.</div>
           <textarea data-key="misc.notes" aria-label="Anything else"></textarea>
