@@ -261,6 +261,7 @@
 
   var fields = Array.prototype.slice.call(root.querySelectorAll('[data-key]'));
   var locked = false;
+  var loaded = false;
   var itemId = null;
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -288,7 +289,7 @@
 
   var saveTimer = null, saving = false, pending = false;
   function doSave(extra) {
-    if (locked) return;
+    if (locked || !loaded) return;
     if (saving) { pending = true; return; }
     saving = true; setSave('saving', 'Saving…');
     var data = collect();
@@ -298,7 +299,7 @@
       .catch(function () { setSave('error', 'Couldn’t save, check your connection'); })
       .finally(function () { saving = false; if (pending) { pending = false; doSave(); } });
   }
-  function queueSave() { if (locked) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
+  function queueSave() { if (locked || !loaded) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
 
   // ---- generic auto-expanding table (rows -> " | "-joined lines in a hidden input) ----
   function tableCtl(cfg, bodyEl, valEl) {
@@ -491,7 +492,7 @@
     el.addEventListener('blur', function () { clearTimeout(saveTimer); doSave(); });
   });
   window.addEventListener('beforeunload', function () {
-    if (locked) return;
+    if (locked || !loaded) return;
     try { navigator.sendBeacon(API, new Blob([JSON.stringify({ action: 'save', token: token, data: collect() })], { type: 'application/json' })); } catch (e) {}
   });
 
@@ -529,6 +530,7 @@
     applyDone(data._done);
     lockIfNeeded(data._stage);
     var has = Object.keys(data).length > 0;
+    loaded = true;
     if (locked) setSave('idle', 'Locked');
     else if (has) setSave('saved', 'All changes saved');
     else setSave('idle', 'Ready to start typing');
@@ -538,8 +540,9 @@
     postJSON(API, { action: 'load', token: token })
       .then(handleLoad)
       .catch(function () {
-        if (attempt < 2) setTimeout(function () { loadForm(attempt + 1); }, 700 * (attempt + 1));
-        else setSave('error', 'Couldn’t load your info — check your connection and refresh');
+        if (attempt < 2) { setTimeout(function () { loadForm(attempt + 1); }, 700 * (attempt + 1)); return; }
+        loaded = true; // let the client still work; sparse saves won't clobber stored data
+        setSave('error', 'Couldn’t load your info — check your connection and refresh');
       });
   }
   loadForm(0);
