@@ -7,6 +7,35 @@
   var UPLOAD = "https://webouts.app.n8n.cloud/webhook/onboarding-upload";
   var MAX = 10 * 1024 * 1024; // 10 MB per file
 
+  // ---- table definitions (rendered + wired generically) ----
+  var TABLES = {
+    contacts: { key: 'contacts.list', cols: [
+      { c: 'Name', ph: 'Full name' },
+      { c: 'Title / role', ph: 'Practice Manager' },
+      { c: 'Email', ph: 'name@org.com' },
+      { c: 'Phone', ph: '(555) 555-5555' }
+    ] },
+    team: { key: 'team.list', cols: [
+      { c: 'Name', ph: 'Full name' },
+      { c: 'Role', ph: 'Marketing Director' },
+      { c: 'What they handle', ph: 'Final approvals' }
+    ] },
+    providers: { key: 'providers.launchList', cols: [
+      { c: 'Provider name', ph: 'Dr. Jane Smith' },
+      { c: 'Specialty', ph: 'Cardiology' },
+      { c: 'Email', ph: 'jane@org.com' }
+    ] },
+    approvals: { key: 'approval.process', cols: [
+      { c: 'Approval step', ph: 'e.g. Reviews thumbnails' },
+      { c: 'Who is responsible (name & title)', ph: 'Name, title' }
+    ], seed: [
+      ['Reviews scripts', ''],
+      ['Gives final approval on scripts', ''],
+      ['Reviews videos', ''],
+      ['Gives final approval on videos', '']
+    ] }
+  };
+
   var STYLE = `
   #wo-onb{max-width:720px;margin:0 auto;padding:8px 16px 72px;font-family:'Poppins',Arial,Helvetica,sans-serif;color:#1f2430;line-height:1.5}
   #wo-onb h1{color:#07378C;font-size:27px;font-weight:800;margin:6px 0 6px;letter-spacing:-.4px}
@@ -41,13 +70,11 @@
   #wo-onb input::placeholder,#wo-onb textarea::placeholder{color:#aab0ba}
   #wo-onb textarea{min-height:92px;resize:vertical}
   #wo-onb input:focus,#wo-onb textarea:focus{outline:none;border-color:#07378C;box-shadow:0 0 0 3px #dbe4f7}
-  #wo-onb .row{display:flex;gap:12px;flex-wrap:wrap}
-  #wo-onb .row>.fld{flex:1;min-width:190px}
 
-  /* provider spreadsheet */
-  #wo-onb .ss{border:1px solid #d3d8e0;border-radius:9px;overflow:hidden}
+  /* tables */
+  #wo-onb .ss{border:1px solid #d3d8e0;border-radius:9px;overflow-x:auto}
   #wo-onb .sstab{width:100%;border-collapse:collapse;font-size:14px}
-  #wo-onb .sstab th{background:#f2f6ff;color:#07378C;font-size:11.5px;font-weight:700;text-align:left;padding:9px 13px;border-bottom:1px solid #d6e3ff;letter-spacing:.3px}
+  #wo-onb .sstab th{background:#f2f6ff;color:#07378C;font-size:11.5px;font-weight:700;text-align:left;padding:9px 13px;border-bottom:1px solid #d6e3ff;letter-spacing:.3px;white-space:nowrap}
   #wo-onb .sstab th.rmc{width:40px}
   #wo-onb .sstab td{padding:0;border-bottom:1px solid #eef0f4}
   #wo-onb .sstab tr:last-child td{border-bottom:0}
@@ -78,6 +105,19 @@
   #wo-onb .done h1{font-size:28px}
   `;
 
+  function tableHTML(id, cfg) {
+    var ths = cfg.cols.map(function (c) { return '<th>' + c.c + '</th>'; }).join('') + '<th class="rmc"></th>';
+    return '<div class="ss"><table class="sstab"><thead><tr>' + ths + '</tr></thead>'
+      + '<tbody id="wo-' + id + '"></tbody></table></div>'
+      + '<input type="hidden" data-key="' + cfg.key + '" id="wo-' + id + '-val">';
+  }
+  function uploadHTML(id, hint) {
+    return '<div class="upl"><label class="btn" id="wo-' + id + '-btn" for="wo-' + id + '-file">Choose file(s) to upload</label>'
+      + '<input type="file" id="wo-' + id + '-file" multiple>'
+      + '<div class="hint">' + hint + '</div></div>'
+      + '<ul class="files" id="wo-' + id + '-files"></ul>';
+  }
+
   var HTML = `
   <div id="wo-onb">
     <div class="bar">
@@ -107,12 +147,8 @@
         <h2><span class="num">2</span> Key people</h2>
         <p class="intro">Who we’ll be working with.</p>
         <div class="secbody">
-          <div class="row">
-            <div class="fld"><label>Main contact</label><input type="text" data-key="contact.name" placeholder="Full name"></div>
-            <div class="fld"><label>Email</label><input type="email" data-key="contact.email"></div>
-            <div class="fld"><label>Phone</label><input type="tel" data-key="contact.phone"></div>
-          </div>
-          <div class="fld"><label>Your team</label><div class="help">Everyone involved. One per line: name, role, and what they handle.</div><textarea data-key="team.roster" placeholder="Dr. Alex Rivera, Marketing Director, final approvals"></textarea></div>
+          <div class="fld"><label>Main contact(s)</label><div class="help">Your day-to-day point(s) of contact. Add as many as you need.</div>${tableHTML('contacts', TABLES.contacts)}</div>
+          <div class="fld"><label>Your wider team</label><div class="help">Anyone else involved and what they handle, so we route things to the right person.</div>${tableHTML('team', TABLES.team)}</div>
           <div class="fld"><label>Who sends the kickoff email to providers?</label><div class="help">The first announcement lands best from one of your leaders. Name and title, or tell us you’d like WebOuts to send it.</div><input type="text" data-key="rollout.leadershipSender" placeholder="e.g. Dr. Jordan Lee, Chief Medical Officer"></div>
         </div>
       </div>
@@ -121,13 +157,7 @@
         <h2><span class="num">3</span> Providers to feature</h2>
         <div class="secbody">
           <div class="help">List the providers you’d like to feature, and include about <strong>50% more than your first-round target</strong> so we can cover scheduling conflicts (targeting 16? list 24. A full week of 40? list 60). Start typing and a new row appears automatically.</div>
-          <div class="ss">
-            <table class="sstab">
-              <thead><tr><th>Provider name</th><th>Specialty</th><th class="rmc"></th></tr></thead>
-              <tbody id="wo-prov"></tbody>
-            </table>
-          </div>
-          <input type="hidden" data-key="providers.launchList" id="wo-prov-val">
+          ${tableHTML('providers', TABLES.providers)}
         </div>
       </div>
 
@@ -143,30 +173,25 @@
         <h2><span class="num">5</span> Look, sound &amp; SEO</h2>
         <p class="intro">How you’d like the videos to feel. Share what you have, and we’ll fill any gaps.</p>
         <div class="secbody">
-          <div class="fld"><label>Graphics</label><div class="help">Lower-thirds, title cards, backgrounds and thumbnails. If you have editable <strong>Adobe or DaVinci Resolve</strong> project files, share them and we’ll match your look exactly. Otherwise we’ll design a set from your brand guidelines. What can you provide?</div><textarea data-key="graphics.standards"></textarea></div>
+          <div class="fld"><label>Graphics</label><div class="help">Lower-thirds, title cards, backgrounds and thumbnails. If you have editable <strong>Adobe or DaVinci Resolve</strong> project files, upload them below and we’ll use those files directly. If not, we’ll design a set from your brand guidelines.</div>${uploadHTML('gfx', 'Upload your Adobe or DaVinci Resolve project files. Something larger? Email it and we’ll add it.')}</div>
           <div class="fld"><label>Scripting</label><div class="help">Tone and voice, any must-say or never-say, reading level, and legal or compliance notes.</div><textarea data-key="scripting.standards"></textarea></div>
-          <div class="fld"><label>SEO</label><div class="help">Target keywords, title and file-naming conventions, and any SEO guidelines you follow.</div><textarea data-key="seo.standards"></textarea></div>
+          <div class="fld"><label>SEO</label><div class="help">If you follow an SEO formula for titles, descriptions or file names, paste it here, or drop in a couple of real examples from past videos. We’ll build off your exact pattern.</div><textarea data-key="seo.standards" placeholder="e.g. [Provider Name], [Specialty] | [Organization] — [City, State]"></textarea></div>
         </div>
       </div>
 
       <div class="sec">
         <h2><span class="num">6</span> Brand guidelines</h2>
         <div class="secbody">
-          <div class="help">Upload your brand guidelines (PDF or image, up to 10&nbsp;MB each). Add as many as you like: style guide, logo files, and so on. Something larger? Email it and we’ll attach it.</div>
-          <div class="upl">
-            <label class="btn" id="wo-uplbtn" for="wo-file">Choose file(s) to upload</label>
-            <input type="file" id="wo-file" multiple>
-            <div class="hint">Files attach straight to your onboarding record.</div>
-          </div>
-          <ul class="files" id="wo-files"></ul>
+          <div class="help">Upload your brand guidelines (PDF or image, up to 10&nbsp;MB each). Add as many as you like: style guide, logo files, colors and fonts. Something larger? Email it and we’ll attach it.</div>
+          ${uploadHTML('brand', 'Files attach straight to your onboarding record.')}
         </div>
       </div>
 
       <div class="sec">
         <h2><span class="num">7</span> Approvals &amp; process</h2>
         <div class="secbody">
-          <div class="fld"><label>Approvals</label><div class="help">Who signs off on scripts, and who gives final approval on finished videos?</div><textarea data-key="approval.process"></textarea></div>
-          <div class="fld"><label>How your team works</label><div class="help">How your team is organized and how requests get routed, and anything that helps us keep things moving.</div><textarea data-key="process.details"></textarea></div>
+          <div class="fld"><label>Approvals</label><div class="help">Who signs off at each step? Fill in who’s responsible, and add any other checks your videos go through before they’re final.</div>${tableHTML('approvals', TABLES.approvals)}</div>
+          <div class="fld"><label>How your team works</label><div class="help">We want to understand how your team is set up so we can plug into your existing structure and serve you better. Tell us how requests get routed and anything that helps us keep things moving smoothly.</div><textarea data-key="process.details"></textarea></div>
         </div>
       </div>
 
@@ -198,9 +223,6 @@
   var dotEl = document.getElementById('wo-dot');
   var statEl = document.getElementById('wo-stat');
   var linkEl = document.getElementById('wo-link');
-  var fileInput = document.getElementById('wo-file');
-  var provBody = document.getElementById('wo-prov');
-  var provVal = document.getElementById('wo-prov-val');
 
   var params = new URLSearchParams(location.search);
   var token = params.get('c');
@@ -214,7 +236,6 @@
   var fields = Array.prototype.slice.call(root.querySelectorAll('[data-key]'));
   var locked = false;
   var itemId = null;
-  var uploaded = []; // [{name, st:'ok'|'up'|'err', msg}]
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
@@ -253,53 +274,60 @@
   }
   function queueSave() { if (locked) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
 
-  // ---- provider spreadsheet (auto-expanding rows -> providers.launchList) ----
-  function provSerialize() {
-    var lines = [];
-    Array.prototype.forEach.call(provBody.querySelectorAll('tr'), function (tr) {
-      var n = tr.querySelector('.pn').value.trim();
-      var s = tr.querySelector('.ps').value.trim();
-      if (!n && !s) return;
-      lines.push(s ? (n + ', ' + s) : n);
-    });
-    provVal.value = lines.join('\n');
+  // ---- generic auto-expanding table (rows -> " | "-joined lines in a hidden input) ----
+  function tableCtl(cfg, bodyEl, valEl) {
+    function rowEmpty(tr) { return Array.prototype.every.call(tr.querySelectorAll('input'), function (i) { return !i.value.trim(); }); }
+    function serialize() {
+      var lines = [];
+      Array.prototype.forEach.call(bodyEl.querySelectorAll('tr'), function (tr) {
+        if (rowEmpty(tr)) return;
+        var vals = Array.prototype.map.call(tr.querySelectorAll('input'), function (i) { return i.value.trim(); });
+        lines.push(vals.join(' | '));
+      });
+      valEl.value = lines.join('\n');
+    }
+    function ensureBlank() {
+      var rows = bodyEl.querySelectorAll('tr');
+      var last = rows[rows.length - 1];
+      if (!last || !rowEmpty(last)) bodyEl.appendChild(row([]));
+    }
+    function onInput() { ensureBlank(); serialize(); queueSave(); }
+    function row(vals) {
+      var tr = document.createElement('tr');
+      var html = cfg.cols.map(function (c) { return '<td><input type="text" placeholder="' + esc(c.ph || '') + '"></td>'; }).join('');
+      html += '<td><button type="button" class="rm" aria-label="Remove row">×</button></td>';
+      tr.innerHTML = html;
+      var inputs = tr.querySelectorAll('input');
+      cfg.cols.forEach(function (c, idx) { if (vals[idx]) inputs[idx].value = vals[idx]; });
+      Array.prototype.forEach.call(inputs, function (inp) {
+        inp.addEventListener('input', onInput);
+        inp.addEventListener('blur', function () { clearTimeout(saveTimer); serialize(); doSave(); });
+      });
+      tr.querySelector('.rm').addEventListener('click', function () {
+        if (locked) return;
+        tr.parentNode.removeChild(tr);
+        if (!bodyEl.querySelector('tr')) bodyEl.appendChild(row([]));
+        ensureBlank(); serialize(); queueSave();
+      });
+      return tr;
+    }
+    function build(str) {
+      bodyEl.innerHTML = '';
+      var lines = String(str || '').split('\n').filter(function (l) { return l.trim(); });
+      if (!lines.length && cfg.seed) { cfg.seed.forEach(function (s) { bodyEl.appendChild(row(s)); }); }
+      else lines.forEach(function (line) { bodyEl.appendChild(row(line.split(' | '))); });
+      ensureBlank(); serialize();
+    }
+    return { build: build };
   }
-  function rowEmpty(tr) { return !tr.querySelector('.pn').value.trim() && !tr.querySelector('.ps').value.trim(); }
-  function ensureTrailingBlank() {
-    var rows = provBody.querySelectorAll('tr');
-    var last = rows[rows.length - 1];
-    if (!last || !rowEmpty(last)) provBody.appendChild(provRow('', ''));
-  }
-  function onProvInput() { ensureTrailingBlank(); provSerialize(); queueSave(); }
-  function provRow(name, spec) {
-    var tr = document.createElement('tr');
-    tr.innerHTML = '<td><input type="text" class="pn" placeholder="Dr. Jane Smith"></td>'
-      + '<td><input type="text" class="ps" placeholder="Cardiology"></td>'
-      + '<td><button type="button" class="rm" aria-label="Remove row">×</button></td>';
-    tr.querySelector('.pn').value = name || '';
-    tr.querySelector('.ps').value = spec || '';
-    Array.prototype.forEach.call(tr.querySelectorAll('input'), function (inp) {
-      inp.addEventListener('input', onProvInput);
-      inp.addEventListener('blur', function () { clearTimeout(saveTimer); provSerialize(); doSave(); });
-    });
-    tr.querySelector('.rm').addEventListener('click', function () {
-      if (locked) return;
-      tr.parentNode.removeChild(tr);
-      if (!provBody.querySelector('tr')) provBody.appendChild(provRow('', ''));
-      ensureTrailingBlank(); provSerialize(); queueSave();
-    });
-    return tr;
-  }
-  function buildProv(str) {
-    provBody.innerHTML = '';
-    String(str || '').split('\n').forEach(function (line) {
-      line = line.trim(); if (!line) return;
-      var i = line.indexOf(', ');
-      provBody.appendChild(provRow(i >= 0 ? line.slice(0, i) : line, i >= 0 ? line.slice(i + 2) : ''));
-    });
-    ensureTrailingBlank();
-  }
-  buildProv('');
+
+  var tableCtls = {};
+  Object.keys(TABLES).forEach(function (id) {
+    var body = document.getElementById('wo-' + id);
+    var val = document.getElementById('wo-' + id + '-val');
+    tableCtls[id] = tableCtl(TABLES[id], body, val);
+    tableCtls[id].build('');
+  });
 
   // Make sure a row exists (and we know its id) before attaching a file.
   function ensureItem() {
@@ -307,7 +335,6 @@
     return postJSON(API, { action: 'save', token: token, data: collect() })
       .then(function (res) { if (res && res.itemId) itemId = res.itemId; return itemId; });
   }
-
   function readB64(file) {
     return new Promise(function (resolve, reject) {
       var fr = new FileReader();
@@ -317,41 +344,55 @@
     });
   }
 
-  function renderFiles() {
-    var ul = document.getElementById('wo-files');
-    ul.innerHTML = uploaded.map(function (e) {
-      var lbl = e.st === 'ok' ? '<span class="st ok">uploaded</span>'
-        : e.st === 'up' ? '<span class="st">uploading…</span>'
-        : '<span class="st err">' + esc(e.msg || 'failed') + '</span>';
-      return '<li><span>' + esc(e.name) + '</span>' + lbl + '</li>';
-    }).join('');
-  }
-  function persistFiles() {
-    var names = uploaded.filter(function (e) { return e.st === 'ok'; }).map(function (e) { return e.name; });
-    doSave({ 'brandGuide.files': names.join(', ') });
+  // ---- generic upload widget (one per Monday Files column) ----
+  function uploadCtl(kind, dataKey, id) {
+    var inputEl = document.getElementById('wo-' + id + '-file');
+    var listEl = document.getElementById('wo-' + id + '-files');
+    var btnEl = document.getElementById('wo-' + id + '-btn');
+    var items = [];
+    function render() {
+      listEl.innerHTML = items.map(function (e) {
+        var lbl = e.st === 'ok' ? '<span class="st ok">uploaded</span>'
+          : e.st === 'up' ? '<span class="st">uploading…</span>'
+          : '<span class="st err">' + esc(e.msg || 'failed') + '</span>';
+        return '<li><span>' + esc(e.name) + '</span>' + lbl + '</li>';
+      }).join('');
+    }
+    function persist() {
+      var names = items.filter(function (e) { return e.st === 'ok'; }).map(function (e) { return e.name; });
+      var o = {}; o[dataKey] = names.join(', '); doSave(o);
+    }
+    function one(file) {
+      if (locked) return;
+      var entry = { name: file.name, st: 'up' };
+      items.push(entry); render();
+      if (file.size > MAX) { entry.st = 'err'; entry.msg = 'too large (max 10 MB)'; render(); return; }
+      ensureItem().then(function (rid) {
+        if (!rid) { entry.st = 'err'; entry.msg = 'type something first, then retry'; render(); return; }
+        return readB64(file).then(function (b64) {
+          return postJSON(UPLOAD, { token: token, itemId: rid, kind: kind, filename: file.name, mime: file.type || 'application/octet-stream', dataB64: b64 });
+        }).then(function (res) {
+          if (res && res.ok) { entry.st = 'ok'; render(); persist(); }
+          else { entry.st = 'err'; entry.msg = (res && res.error) || 'upload failed'; render(); }
+        });
+      }).catch(function () { entry.st = 'err'; entry.msg = 'upload failed'; render(); });
+    }
+    inputEl.addEventListener('change', function () {
+      Array.prototype.slice.call(this.files || []).forEach(one);
+      this.value = '';
+    });
+    return {
+      load: function (str) {
+        items = String(str || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+          .map(function (n) { return { name: n, st: 'ok' }; });
+        render();
+      },
+      disable: function () { inputEl.disabled = true; if (btnEl) btnEl.style.display = 'none'; }
+    };
   }
 
-  function uploadOne(file) {
-    if (locked) return;
-    var entry = { name: file.name, st: 'up' };
-    uploaded.push(entry); renderFiles();
-    if (file.size > MAX) { entry.st = 'err'; entry.msg = 'too large (max 10 MB)'; renderFiles(); return; }
-    ensureItem().then(function (id) {
-      if (!id) { entry.st = 'err'; entry.msg = 'type something first, then retry'; renderFiles(); return; }
-      return readB64(file).then(function (b64) {
-        return postJSON(UPLOAD, { token: token, itemId: id, filename: file.name, mime: file.type || 'application/octet-stream', dataB64: b64 });
-      }).then(function (res) {
-        if (res && res.ok) { entry.st = 'ok'; renderFiles(); persistFiles(); }
-        else { entry.st = 'err'; entry.msg = (res && res.error) || 'upload failed'; renderFiles(); }
-      });
-    }).catch(function () { entry.st = 'err'; entry.msg = 'upload failed'; renderFiles(); });
-  }
-
-  fileInput.addEventListener('change', function () {
-    var fs = Array.prototype.slice.call(this.files || []);
-    fs.forEach(uploadOne);
-    this.value = '';
-  });
+  var gfxUp = uploadCtl('graphics', 'graphics.files', 'gfx');
+  var brandUp = uploadCtl('brand', 'brandGuide.files', 'brand');
 
   fields.forEach(function (el) {
     el.addEventListener('input', queueSave);
@@ -380,9 +421,8 @@
       locked = true;
       document.getElementById('wo-lockmsg').style.display = 'block';
       fields.forEach(function (el) { el.disabled = true; });
-      Array.prototype.forEach.call(provBody.querySelectorAll('input,button'), function (el) { el.disabled = true; });
-      fileInput.disabled = true;
-      document.getElementById('wo-uplbtn').style.display = 'none';
+      Array.prototype.forEach.call(root.querySelectorAll('.sstab input, .sstab button'), function (el) { el.disabled = true; });
+      gfxUp.disable(); brandUp.disable();
       document.getElementById('wo-submit').style.display = 'none';
     }
   }
@@ -393,10 +433,9 @@
       var data = (res && res.data) || {};
       if (res && res.itemId) itemId = res.itemId;
       apply(data);
-      buildProv(data['providers.launchList'] || '');
-      uploaded = String(data['brandGuide.files'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean)
-        .map(function (n) { return { name: n, st: 'ok' }; });
-      renderFiles();
+      Object.keys(TABLES).forEach(function (id) { tableCtls[id].build(data[TABLES[id].key] || ''); });
+      gfxUp.load(data['graphics.files']);
+      brandUp.load(data['brandGuide.files']);
       lockIfNeeded(data._stage);
       var has = Object.keys(data).length > 0;
       setSave('idle', locked ? 'Locked' : (has ? 'All changes saved' : 'Ready to start typing'));
