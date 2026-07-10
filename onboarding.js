@@ -22,7 +22,6 @@
   #wo-onb input:focus,#wo-onb textarea:focus{outline:none;border-color:#07378C;box-shadow:0 0 0 3px #dbe4f7}
   #wo-onb .row{display:flex;gap:12px;flex-wrap:wrap}
   #wo-onb .row>.fld{flex:1;min-width:200px}
-  #wo-onb .langs label:has(input){display:inline-flex;align-items:center;gap:6px;font-weight:400;margin-right:18px;color:#111827}
   #wo-onb .upl{border:1px dashed #c9ccd1;border-radius:10px;padding:16px;text-align:center;background:#fafbfc}
   #wo-onb .upl input[type=file]{display:none}
   #wo-onb .upl .btn{display:inline-block;background:#eef2fb;color:#07378C;font-weight:700;font-size:14px;padding:10px 18px;border-radius:8px;cursor:pointer}
@@ -88,16 +87,13 @@
       <div class="sec">
         <h2>Production &amp; filming</h2>
         <div class="fld"><label>Filming location (address)</label><div class="help">Where should our crew come to film your providers?</div><input type="text" data-key="filming.location"></div>
-        <div class="fld langs"><label>Languages needed</label>
-          <label><input type="radio" name="wo-lang" data-key="filming.languages" value="EN"> English only</label>
-          <label><input type="radio" name="wo-lang" data-key="filming.languages" value="EN,ES"> English &amp; Spanish</label>
-        </div>
         <div class="fld"><label>Production &amp; filming details</label><div class="help">On-site contact, parking/building access, the room or space we’ll film in, best days/times, and anything else our crew should know.</div><textarea data-key="production.details"></textarea></div>
       </div>
 
       <div class="sec">
         <h2>Graphic standards</h2>
-        <div class="fld"><label>Video text, branding, backgrounds &amp; thumbnails</label><div class="help">How on-screen text and lower-thirds should look, logo &amp; branding usage, background style, and any thumbnail do’s and don’ts.</div><textarea data-key="graphics.standards"></textarea></div>
+        <div class="help">This covers the on-screen graphics in your videos — lower-thirds, name &amp; title cards, backgrounds, and thumbnails. There are two ways we set these up: <strong>(1)</strong> if your team already has editable design files — Adobe (After Effects, Premiere, Photoshop, Illustrator) or DaVinci Resolve project files — share them and we’ll match your existing look exactly; or <strong>(2)</strong> if they don’t exist yet, we’ll design a clean set from your brand guidelines for your approval.</div>
+        <div class="fld"><label>What can you provide?</label><div class="help">Let us know which editable files you can share (and how you’ll send them), or tell us you’d like WebOuts to create the graphics from scratch.</div><textarea data-key="graphics.standards"></textarea></div>
       </div>
 
       <div class="sec">
