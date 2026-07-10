@@ -174,7 +174,7 @@
           <div class="fld"><label>Your wider team</label><div class="help">Anyone else involved, so we route things to the right person.</div>${tableHTML('team', TABLES.team)}</div>
           <div class="fld"><label>Who sends the kickoff email to providers?</label><div class="help">This should come from a senior leader, ideally someone in the C-suite or the president, someone with real sway over your providers. When the ask comes from the top, providers treat it as a priority instead of a nice-to-have from marketing or communications, and participation goes way up. Give us their name and title, or tell us you’d like WebOuts to send it.</div><input type="text" data-key="rollout.leadershipSender" placeholder="e.g. Dr. Jordan Lee, Chief Medical Officer"></div>
           <div class="fld"><label>Approvals</label><div class="help">Who signs off at each step? Add each person, and add any other checks your videos go through before they’re final.</div>${tableHTML('approvals', TABLES.approvals)}</div>
-          <div class="fld"><label>How your team works</label><div class="help">We want to understand how your team is set up so we can plug into your existing structure and serve you better. Tell us how requests get routed and anything that helps us keep things moving smoothly.</div><textarea data-key="process.details"></textarea></div>
+          <div class="fld"><label>Anything else we should know about your team?</label><div class="help">Optional and open-ended. Anything about how your team is set up or likes to work that helps us serve you better.</div><textarea data-key="process.details"></textarea></div>
         </div>
       </div>
 
