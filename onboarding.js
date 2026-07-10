@@ -87,7 +87,8 @@
 
   /* upload */
   #wo-onb .upl{border:1.5px dashed #c9d0da;border-radius:11px;padding:20px 16px;text-align:center;background:#fafbfd}
-  #wo-onb .upl input[type=file]{display:none}
+  #wo-onb .upl input[type=file]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
+  #wo-onb .upl:focus-within .btn{outline:2px solid #07378C;outline-offset:2px}
   #wo-onb .upl .btn{display:inline-block;background:#eef2fb;color:#07378C;font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px;cursor:pointer}
   #wo-onb .upl .btn:hover{background:#e2e9f8}
   #wo-onb .upl .hint{color:#8a93a3;font-size:12px;margin-top:9px}
@@ -144,7 +145,7 @@
   var HTML = `
   <div id="wo-onb">
     <div class="bar">
-      <span class="save"><span class="dot" id="wo-dot"></span><span id="wo-stat">Loading…</span></span>
+      <span class="save"><span class="dot" id="wo-dot"></span><span id="wo-stat" role="status" aria-live="polite">Loading…</span></span>
       <div class="linkwrap">
         <span class="linklabel">Your private link — save it, or share it with your team</span>
         <span class="linkbox" id="wo-link"></span>
@@ -306,7 +307,7 @@
       var lines = [];
       Array.prototype.forEach.call(bodyEl.querySelectorAll('tr'), function (tr) {
         if (rowEmpty(tr)) return;
-        var vals = Array.prototype.map.call(tr.querySelectorAll('input'), function (i) { return i.value.trim(); });
+        var vals = Array.prototype.map.call(tr.querySelectorAll('input'), function (i) { return i.value.trim().replace(/ \| /g, ' / '); });
         lines.push(vals.join(' | '));
       });
       valEl.value = lines.join('\n');
@@ -341,7 +342,7 @@
       var lines = String(str || '').split('\n').filter(function (l) { return l.trim(); });
       if (!lines.length && cfg.seed) { cfg.seed.forEach(function (s) { bodyEl.appendChild(row(s)); }); }
       else lines.forEach(function (line) { bodyEl.appendChild(row(line.split(' | '))); });
-      ensureBlank(); serialize();
+      ensureBlank();
     }
     function addRows(rowsVals) {
       var rows = bodyEl.querySelectorAll('tr');
@@ -433,25 +434,38 @@
   secs.forEach(function (sec, i) {
     sec.setAttribute('data-sec', SEC_SLUGS[i] || ('s' + i));
     var h = sec.querySelector('h2');
-    h.insertAdjacentHTML('beforeend', '<span class="done-toggle" title="Mark this section completed"><span class="check">✓</span><span class="done-label">Completed</span></span><span class="chev"></span>');
-    h.querySelector('.done-toggle').addEventListener('click', function (e) {
-      e.stopPropagation();
+    h.setAttribute('role', 'button');
+    h.setAttribute('tabindex', '0');
+    h.setAttribute('aria-expanded', 'false');
+    h.insertAdjacentHTML('beforeend', '<span class="done-toggle" role="checkbox" tabindex="0" aria-checked="false" aria-label="Mark this section completed"><span class="check" aria-hidden="true">✓</span><span class="done-label">Completed</span></span><span class="chev" aria-hidden="true"></span>');
+    var toggle = h.querySelector('.done-toggle');
+    function toggleDone() {
       if (locked) return;
       var slug = sec.getAttribute('data-sec');
-      if (sec.classList.toggle('filled')) doneSecs[slug] = 1; else delete doneSecs[slug];
+      var on = sec.classList.toggle('filled');
+      if (on) doneSecs[slug] = 1; else delete doneSecs[slug];
+      toggle.setAttribute('aria-checked', on ? 'true' : 'false');
       doSave({ _done: Object.keys(doneSecs).join(',') });
-    });
-    h.addEventListener('click', function () {
+    }
+    toggle.addEventListener('click', function (e) { e.stopPropagation(); toggleDone(); });
+    toggle.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleDone(); } });
+    function toggleOpen() {
       var wasOpen = sec.classList.contains('open');
-      secs.forEach(function (s) { s.classList.remove('open'); });
-      if (!wasOpen) sec.classList.add('open');
-    });
+      secs.forEach(function (s) { s.classList.remove('open'); s.querySelector('h2').setAttribute('aria-expanded', 'false'); });
+      if (!wasOpen) { sec.classList.add('open'); h.setAttribute('aria-expanded', 'true'); }
+    }
+    h.addEventListener('click', toggleOpen);
+    h.addEventListener('keydown', function (e) { if (e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleOpen(); } });
   });
-  if (secs[0]) secs[0].classList.add('open');
+  if (secs[0]) { secs[0].classList.add('open'); secs[0].querySelector('h2').setAttribute('aria-expanded', 'true'); }
   function applyDone(str) {
     doneSecs = {};
     String(str || '').split(',').filter(Boolean).forEach(function (slug) { doneSecs[slug] = 1; });
-    secs.forEach(function (sec) { sec.classList.toggle('filled', !!doneSecs[sec.getAttribute('data-sec')]); });
+    secs.forEach(function (sec) {
+      var on = !!doneSecs[sec.getAttribute('data-sec')];
+      sec.classList.toggle('filled', on);
+      var t = sec.querySelector('.done-toggle'); if (t) t.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
   }
 
   // ---- provider bulk paste (Excel / Sheets -> table rows) ----
@@ -488,6 +502,7 @@
   });
 
   document.getElementById('wo-submit').addEventListener('click', function () {
+    if (!confirm('Submit your onboarding info for review? You can still make changes until the WebOuts team locks it in.')) return;
     doSave({ _stage: 'Submitted for Review' });
     document.getElementById('wo-form').style.display = 'none';
     document.getElementById('wo-done').style.display = 'block';
@@ -504,20 +519,28 @@
     }
   }
 
-  setSave('saving', 'Loading…');
-  postJSON(API, { action: 'load', token: token })
-    .then(function (res) {
-      var data = (res && res.data) || {};
-      if (res && res.itemId) itemId = res.itemId;
-      apply(data);
-      Object.keys(TABLES).forEach(function (id) { tableCtls[id].build(data[TABLES[id].key] || ''); });
-      gfxUp.load(data['graphics.files']);
-      brandUp.load(data['brandGuide.files']);
-      applyDone(data._done);
-      lockIfNeeded(data._stage);
-      var has = Object.keys(data).length > 0;
-      setSave('idle', locked ? 'Locked' : (has ? 'All changes saved' : 'Ready to start typing'));
-      if (has && !locked) setSave('saved', 'All changes saved');
-    })
-    .catch(function () { setSave('idle', 'Ready to start typing'); });
+  function handleLoad(res) {
+    var data = (res && res.data) || {};
+    if (res && res.itemId) itemId = res.itemId;
+    apply(data);
+    Object.keys(TABLES).forEach(function (id) { tableCtls[id].build(data[TABLES[id].key] || ''); });
+    gfxUp.load(data['graphics.files']);
+    brandUp.load(data['brandGuide.files']);
+    applyDone(data._done);
+    lockIfNeeded(data._stage);
+    var has = Object.keys(data).length > 0;
+    if (locked) setSave('idle', 'Locked');
+    else if (has) setSave('saved', 'All changes saved');
+    else setSave('idle', 'Ready to start typing');
+  }
+  function loadForm(attempt) {
+    setSave('saving', 'Loading…');
+    postJSON(API, { action: 'load', token: token })
+      .then(handleLoad)
+      .catch(function () {
+        if (attempt < 2) setTimeout(function () { loadForm(attempt + 1); }, 700 * (attempt + 1));
+        else setSave('error', 'Couldn’t load your info — check your connection and refresh');
+      });
+  }
+  loadForm(0);
 })();
