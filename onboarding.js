@@ -1,6 +1,6 @@
-/* WebOuts Client Onboarding widget — deployed via GitHub + jsDelivr.
+/* WebOuts Client Onboarding widget, deployed via GitHub + jsDelivr.
  * The Bricks page only holds a tiny loader (see onboarding-loader.html).
- * Edit this file, push to GitHub, purge jsDelivr → the live page updates.
+ * Edit this file, push to GitHub, purge jsDelivr, the live page updates.
  * No secrets here; it posts to the public n8n onboarding API. */
 (function () {
   var API = "https://webouts.app.n8n.cloud/webhook/onboarding-api";
@@ -44,6 +44,19 @@
   #wo-onb .row{display:flex;gap:12px;flex-wrap:wrap}
   #wo-onb .row>.fld{flex:1;min-width:190px}
 
+  /* provider spreadsheet */
+  #wo-onb .ss{border:1px solid #d3d8e0;border-radius:9px;overflow:hidden}
+  #wo-onb .sstab{width:100%;border-collapse:collapse;font-size:14px}
+  #wo-onb .sstab th{background:#f2f6ff;color:#07378C;font-size:11.5px;font-weight:700;text-align:left;padding:9px 13px;border-bottom:1px solid #d6e3ff;letter-spacing:.3px}
+  #wo-onb .sstab th.rmc{width:40px}
+  #wo-onb .sstab td{padding:0;border-bottom:1px solid #eef0f4}
+  #wo-onb .sstab tr:last-child td{border-bottom:0}
+  #wo-onb .sstab td:not(:last-child){border-right:1px solid #eef0f4}
+  #wo-onb .sstab td input{width:100%;box-sizing:border-box;border:0;border-radius:0;padding:10px 13px;font-size:14px;font-family:inherit;background:transparent;color:#1f2430}
+  #wo-onb .sstab td input:focus{outline:none;box-shadow:inset 0 0 0 2px #dbe4f7;background:#fbfcfe}
+  #wo-onb .sstab .rm{background:transparent;color:#b3bac4;font-size:17px;line-height:1;padding:8px 10px;font-weight:400;width:100%}
+  #wo-onb .sstab .rm:hover{color:#c0392b}
+
   /* upload */
   #wo-onb .upl{border:1.5px dashed #c9d0da;border-radius:11px;padding:20px 16px;text-align:center;background:#fafbfd}
   #wo-onb .upl input[type=file]{display:none}
@@ -70,15 +83,15 @@
     <div class="bar">
       <span class="save"><span class="dot" id="wo-dot"></span><span id="wo-stat">Loading…</span></span>
       <div class="linkwrap">
-        <span class="linklabel">🔖 Your private link — save it to return anytime</span>
+        <span class="linklabel">Your private link (save it to return anytime)</span>
         <span class="linkbox" id="wo-link"></span>
       </div>
       <button type="button" class="copy" id="wo-copy">Copy link</button>
     </div>
     <div id="wo-lockmsg" class="locked" style="display:none">This form has been locked by the WebOuts team and is now read-only. Contact us if something needs to change.</div>
 
-    <h1>Welcome — let’s set up your profile videos</h1>
-    <p class="sub">Everything you tell us here helps us start filming. Fill in what you can — you don’t need every answer today. Your progress saves automatically, and you can share your link with teammates to help fill it in.</p>
+    <h1>Welcome! Let’s set up your profile videos</h1>
+    <p class="sub">Everything you tell us here helps us start filming. Fill in what you can. You don’t need every answer today. Your progress saves automatically, and you can share your link with teammates to help fill it in.</p>
 
     <div id="wo-form">
       <div class="sec">
@@ -86,7 +99,7 @@
         <div class="secbody">
           <div class="fld"><label>Organization name</label><input type="text" data-key="identity.displayName" placeholder="e.g. Northwell Health"></div>
           <div class="fld"><label>Website</label><input type="text" data-key="web.site" placeholder="https://…"></div>
-          <div class="fld"><label>Provider email domain(s)</label><div class="help">So we recognize your team — separate multiple with commas.</div><input type="text" data-key="identity.emailDomains" placeholder="northwell.edu"></div>
+          <div class="fld"><label>Provider email domain(s)</label><div class="help">So we recognize your team. Separate multiple with commas.</div><input type="text" data-key="identity.emailDomains" placeholder="northwell.edu"></div>
         </div>
       </div>
 
@@ -99,16 +112,22 @@
             <div class="fld"><label>Email</label><input type="email" data-key="contact.email"></div>
             <div class="fld"><label>Phone</label><input type="tel" data-key="contact.phone"></div>
           </div>
-          <div class="fld"><label>Your team</label><div class="help">Everyone involved — one per line: name, role, and what they handle.</div><textarea data-key="team.roster" placeholder="Dr. Alex Rivera — Marketing Director — final approvals"></textarea></div>
-          <div class="fld"><label>Who sends the kickoff email to providers?</label><div class="help">The first announcement lands best from one of your leaders. Name &amp; title — or tell us you’d like WebOuts to send it.</div><input type="text" data-key="rollout.leadershipSender" placeholder="e.g. Dr. Jordan Lee, Chief Medical Officer"></div>
+          <div class="fld"><label>Your team</label><div class="help">Everyone involved. One per line: name, role, and what they handle.</div><textarea data-key="team.roster" placeholder="Dr. Alex Rivera, Marketing Director, final approvals"></textarea></div>
+          <div class="fld"><label>Who sends the kickoff email to providers?</label><div class="help">The first announcement lands best from one of your leaders. Name and title, or tell us you’d like WebOuts to send it.</div><input type="text" data-key="rollout.leadershipSender" placeholder="e.g. Dr. Jordan Lee, Chief Medical Officer"></div>
         </div>
       </div>
 
       <div class="sec">
         <h2><span class="num">3</span> Providers to feature</h2>
         <div class="secbody">
-          <div class="help">List the providers you’d like to feature, and include about <strong>50% more than your first-round target</strong> so we can cover scheduling conflicts (targeting 16? list 24 — a full week of 40? list 60). One per line: name and specialty.</div>
-          <textarea data-key="providers.launchList" aria-label="Provider list" placeholder="Dr. Sam Okafor — Cardiology"></textarea>
+          <div class="help">List the providers you’d like to feature, and include about <strong>50% more than your first-round target</strong> so we can cover scheduling conflicts (targeting 16? list 24. A full week of 40? list 60). Start typing and a new row appears automatically.</div>
+          <div class="ss">
+            <table class="sstab">
+              <thead><tr><th>Provider name</th><th>Specialty</th><th class="rmc"></th></tr></thead>
+              <tbody id="wo-prov"></tbody>
+            </table>
+          </div>
+          <input type="hidden" data-key="providers.launchList" id="wo-prov-val">
         </div>
       </div>
 
@@ -122,32 +141,32 @@
 
       <div class="sec">
         <h2><span class="num">5</span> Look, sound &amp; SEO</h2>
-        <p class="intro">How you’d like the videos to feel. Share what you have — we’ll fill any gaps.</p>
+        <p class="intro">How you’d like the videos to feel. Share what you have, and we’ll fill any gaps.</p>
         <div class="secbody">
-          <div class="fld"><label>Graphics</label><div class="help">Lower-thirds, title cards, backgrounds and thumbnails. If you have editable <strong>Adobe or DaVinci Resolve</strong> project files, share them and we’ll match your look exactly — otherwise we’ll design a set from your brand guidelines. What can you provide?</div><textarea data-key="graphics.standards"></textarea></div>
-          <div class="fld"><label>Scripting</label><div class="help">Tone and voice, any must-say / never-say, reading level, and legal or compliance notes.</div><textarea data-key="scripting.standards"></textarea></div>
-          <div class="fld"><label>SEO</label><div class="help">Target keywords, title &amp; file-naming conventions, and any SEO guidelines you follow.</div><textarea data-key="seo.standards"></textarea></div>
+          <div class="fld"><label>Graphics</label><div class="help">Lower-thirds, title cards, backgrounds and thumbnails. If you have editable <strong>Adobe or DaVinci Resolve</strong> project files, share them and we’ll match your look exactly. Otherwise we’ll design a set from your brand guidelines. What can you provide?</div><textarea data-key="graphics.standards"></textarea></div>
+          <div class="fld"><label>Scripting</label><div class="help">Tone and voice, any must-say or never-say, reading level, and legal or compliance notes.</div><textarea data-key="scripting.standards"></textarea></div>
+          <div class="fld"><label>SEO</label><div class="help">Target keywords, title and file-naming conventions, and any SEO guidelines you follow.</div><textarea data-key="seo.standards"></textarea></div>
         </div>
       </div>
 
       <div class="sec">
-        <h2><span class="num">6</span> Approvals &amp; process</h2>
+        <h2><span class="num">6</span> Brand guidelines</h2>
         <div class="secbody">
-          <div class="fld"><label>Approvals</label><div class="help">Who signs off on scripts, and who gives final approval on finished videos? How many rounds, and a typical turnaround?</div><textarea data-key="approval.process"></textarea></div>
-          <div class="fld"><label>How your team works</label><div class="help">How your team is organized and how requests get routed — anything that helps us keep things moving.</div><textarea data-key="process.details"></textarea></div>
-        </div>
-      </div>
-
-      <div class="sec">
-        <h2><span class="num">7</span> Brand guidelines</h2>
-        <div class="secbody">
-          <div class="help">Upload your brand guidelines — PDF or image, up to 10&nbsp;MB each. Add as many as you like (style guide, logo files, etc.). Something larger? Email it and we’ll attach it.</div>
+          <div class="help">Upload your brand guidelines (PDF or image, up to 10&nbsp;MB each). Add as many as you like: style guide, logo files, and so on. Something larger? Email it and we’ll attach it.</div>
           <div class="upl">
             <label class="btn" id="wo-uplbtn" for="wo-file">Choose file(s) to upload</label>
             <input type="file" id="wo-file" multiple>
             <div class="hint">Files attach straight to your onboarding record.</div>
           </div>
           <ul class="files" id="wo-files"></ul>
+        </div>
+      </div>
+
+      <div class="sec">
+        <h2><span class="num">7</span> Approvals &amp; process</h2>
+        <div class="secbody">
+          <div class="fld"><label>Approvals</label><div class="help">Who signs off on scripts, and who gives final approval on finished videos?</div><textarea data-key="approval.process"></textarea></div>
+          <div class="fld"><label>How your team works</label><div class="help">How your team is organized and how requests get routed, and anything that helps us keep things moving.</div><textarea data-key="process.details"></textarea></div>
         </div>
       </div>
 
@@ -159,11 +178,11 @@
         </div>
       </div>
 
-      <button type="button" class="submit" id="wo-submit">I’m done — submit for review</button>
+      <button type="button" class="submit" id="wo-submit">I’m done, submit for review</button>
     </div>
 
     <div class="done" id="wo-done" style="display:none">
-      <h1>Thank you! 🎬</h1>
+      <h1>Thank you!</h1>
       <p class="sub">Your information is in with the WebOuts team. We’ll review it and follow up with next steps. You can still reopen your link to make changes until we lock it in.</p>
     </div>
   </div>
@@ -180,6 +199,8 @@
   var statEl = document.getElementById('wo-stat');
   var linkEl = document.getElementById('wo-link');
   var fileInput = document.getElementById('wo-file');
+  var provBody = document.getElementById('wo-prov');
+  var provVal = document.getElementById('wo-prov-val');
 
   var params = new URLSearchParams(location.search);
   var token = params.get('c');
@@ -227,10 +248,58 @@
     if (extra) Object.keys(extra).forEach(function (k) { data[k] = extra[k]; });
     postJSON(API, { action: 'save', token: token, data: data })
       .then(function (res) { if (res && res.itemId) itemId = res.itemId; setSave('saved', 'All changes saved'); })
-      .catch(function () { setSave('error', 'Couldn’t save — check your connection'); })
+      .catch(function () { setSave('error', 'Couldn’t save, check your connection'); })
       .finally(function () { saving = false; if (pending) { pending = false; doSave(); } });
   }
   function queueSave() { if (locked) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
+
+  // ---- provider spreadsheet (auto-expanding rows -> providers.launchList) ----
+  function provSerialize() {
+    var lines = [];
+    Array.prototype.forEach.call(provBody.querySelectorAll('tr'), function (tr) {
+      var n = tr.querySelector('.pn').value.trim();
+      var s = tr.querySelector('.ps').value.trim();
+      if (!n && !s) return;
+      lines.push(s ? (n + ', ' + s) : n);
+    });
+    provVal.value = lines.join('\n');
+  }
+  function rowEmpty(tr) { return !tr.querySelector('.pn').value.trim() && !tr.querySelector('.ps').value.trim(); }
+  function ensureTrailingBlank() {
+    var rows = provBody.querySelectorAll('tr');
+    var last = rows[rows.length - 1];
+    if (!last || !rowEmpty(last)) provBody.appendChild(provRow('', ''));
+  }
+  function onProvInput() { ensureTrailingBlank(); provSerialize(); queueSave(); }
+  function provRow(name, spec) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><input type="text" class="pn" placeholder="Dr. Jane Smith"></td>'
+      + '<td><input type="text" class="ps" placeholder="Cardiology"></td>'
+      + '<td><button type="button" class="rm" aria-label="Remove row">×</button></td>';
+    tr.querySelector('.pn').value = name || '';
+    tr.querySelector('.ps').value = spec || '';
+    Array.prototype.forEach.call(tr.querySelectorAll('input'), function (inp) {
+      inp.addEventListener('input', onProvInput);
+      inp.addEventListener('blur', function () { clearTimeout(saveTimer); provSerialize(); doSave(); });
+    });
+    tr.querySelector('.rm').addEventListener('click', function () {
+      if (locked) return;
+      tr.parentNode.removeChild(tr);
+      if (!provBody.querySelector('tr')) provBody.appendChild(provRow('', ''));
+      ensureTrailingBlank(); provSerialize(); queueSave();
+    });
+    return tr;
+  }
+  function buildProv(str) {
+    provBody.innerHTML = '';
+    String(str || '').split('\n').forEach(function (line) {
+      line = line.trim(); if (!line) return;
+      var i = line.indexOf(', ');
+      provBody.appendChild(provRow(i >= 0 ? line.slice(0, i) : line, i >= 0 ? line.slice(i + 2) : ''));
+    });
+    ensureTrailingBlank();
+  }
+  buildProv('');
 
   // Make sure a row exists (and we know its id) before attaching a file.
   function ensureItem() {
@@ -251,7 +320,7 @@
   function renderFiles() {
     var ul = document.getElementById('wo-files');
     ul.innerHTML = uploaded.map(function (e) {
-      var lbl = e.st === 'ok' ? '<span class="st ok">uploaded ✓</span>'
+      var lbl = e.st === 'ok' ? '<span class="st ok">uploaded</span>'
         : e.st === 'up' ? '<span class="st">uploading…</span>'
         : '<span class="st err">' + esc(e.msg || 'failed') + '</span>';
       return '<li><span>' + esc(e.name) + '</span>' + lbl + '</li>';
@@ -296,7 +365,7 @@
 
   document.getElementById('wo-copy').addEventListener('click', function () {
     navigator.clipboard && navigator.clipboard.writeText(location.href);
-    this.textContent = 'Copied ✓';
+    this.textContent = 'Copied';
     var b = this; setTimeout(function () { b.textContent = 'Copy link'; }, 2000);
   });
 
@@ -311,6 +380,7 @@
       locked = true;
       document.getElementById('wo-lockmsg').style.display = 'block';
       fields.forEach(function (el) { el.disabled = true; });
+      Array.prototype.forEach.call(provBody.querySelectorAll('input,button'), function (el) { el.disabled = true; });
       fileInput.disabled = true;
       document.getElementById('wo-uplbtn').style.display = 'none';
       document.getElementById('wo-submit').style.display = 'none';
@@ -323,12 +393,14 @@
       var data = (res && res.data) || {};
       if (res && res.itemId) itemId = res.itemId;
       apply(data);
+      buildProv(data['providers.launchList'] || '');
       uploaded = String(data['brandGuide.files'] || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean)
         .map(function (n) { return { name: n, st: 'ok' }; });
       renderFiles();
       lockIfNeeded(data._stage);
       var has = Object.keys(data).length > 0;
-      setSave(locked ? 'idle' : (has ? 'saved' : 'idle'), locked ? 'Locked' : (has ? 'All changes saved' : 'Ready — start typing'));
+      setSave('idle', locked ? 'Locked' : (has ? 'All changes saved' : 'Ready to start typing'));
+      if (has && !locked) setSave('saved', 'All changes saved');
     })
-    .catch(function () { setSave('idle', 'Ready — start typing'); });
+    .catch(function () { setSave('idle', 'Ready to start typing'); });
 })();
