@@ -863,7 +863,10 @@
         if (pending) { pending = false; var e = pendingExtra; pendingExtra = null; doSave(e); }
       });
   }
-  function queueSave() { if (locked || halted || !loaded) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
+  // 3s rather than 1.2s: a whole client office shares one public IP, so every extra
+  // request counts against limits they all share. A steady typist now costs a few
+  // saves a minute instead of dozens, and the delay is invisible next to autosave.
+  function queueSave() { if (locked || halted || !loaded) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 3000); }
 
   // ---- generic auto-expanding table (rows -> " | "-joined lines in a hidden input) ----
   function tableCtl(cfg, bodyEl, valEl) {
