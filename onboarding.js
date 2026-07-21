@@ -495,6 +495,20 @@
   #wo-onb button{font-family:inherit;font-weight:700;font-size:14px;border:0;border-radius:9px;padding:10px 18px;cursor:pointer}
   #wo-onb .submit{background:#E26337;color:#fff;font-size:16px;padding:16px 22px;width:100%;margin-top:10px}
   #wo-onb .submit:hover{filter:brightness(1.05)}
+  /* splash: shown only when the URL carries no ?c=, so an emailed link never sees it */
+  #wo-onb #wo-splash{max-width:640px;margin:0 auto;padding:8px 0 40px}
+  #wo-onb .splash-card{border:1px solid #e3e8f0;border-radius:14px;padding:20px 22px;margin:0 0 16px;background:#fff}
+  #wo-onb .splash-card h3{margin:0 0 6px;font-size:17px;color:#07378C}
+  #wo-onb .splash-card p{margin:0 0 14px;font-size:14px;color:#5a6472;line-height:1.5}
+  #wo-onb .splash-row{display:flex;gap:10px;flex-wrap:wrap}
+  #wo-onb .splash-row input{flex:1 1 260px;min-width:0}
+  #wo-onb .splash-go{background:#E26337;color:#fff;border:0;border-radius:10px;padding:11px 20px;font:600 15px/1 inherit;cursor:pointer;white-space:nowrap}
+  #wo-onb .splash-go:hover{background:#c9512a}
+  #wo-onb .splash-err{margin-top:10px;font-size:13.5px;color:#b3411f}
+  #wo-onb .splash-link{background:none;border:0;padding:0;color:#07378C;font:inherit;font-size:inherit;text-decoration:underline;cursor:pointer}
+  #wo-onb #wo-splash-resume{margin-top:12px;font-size:13.5px}
+  #wo-onb .splash-foot{text-align:center;font-size:13.5px;color:#5a6472;margin:22px 0 0}
+  @media (max-width:600px){ #wo-onb .splash-go{width:100%} }
   #wo-onb .locked{background:#FFF4EF;border:1px solid #f3c9bb;border-radius:11px;padding:14px 16px;color:#7a2e12;margin-bottom:18px;font-size:14px}
   #wo-onb .done{text-align:center;padding:48px 16px}
   #wo-onb .done h1{font-size:28px}
@@ -641,6 +655,27 @@
 
   var HTML = `
   <div id="wo-onb">
+    <div id="wo-splash" style="display:none">
+      <h1>Welcome to WebOuts</h1>
+      <p class="sub">This is where we gather everything we need to film your providers. It takes about 10 minutes, and you don’t need every answer today.</p>
+      <div class="splash-card">
+        <h3>Already started?</h3>
+        <p>Paste the private link WebOuts sent you, or the one you saved.</p>
+        <div class="splash-row">
+          <input type="text" id="wo-splash-link" placeholder="https://webouts.com/onboarding?c=…" aria-label="Your private onboarding link">
+          <button type="button" class="splash-go" id="wo-splash-open">Open</button>
+        </div>
+        <div class="splash-err" id="wo-splash-err" style="display:none"></div>
+        <div id="wo-splash-resume" style="display:none"><button type="button" class="splash-link" id="wo-splash-resume-btn">Resume the onboarding you started on this device</button></div>
+      </div>
+      <div class="splash-card">
+        <h3>Starting fresh?</h3>
+        <p>We’ll create a new onboarding and give you a private link to save and share with your team.</p>
+        <button type="button" class="splash-go" id="wo-splash-new">Start a new onboarding</button>
+      </div>
+      <p class="splash-foot">Just want to look around? <button type="button" class="splash-link" id="wo-splash-peek">Preview the form without saving anything</button></p>
+    </div>
+    <div id="wo-previewmsg" class="locked" style="display:none"><strong>Preview mode.</strong> Nothing you type here is saved and no record is created. To fill this in for real, reload the page and start a new onboarding.</div>
     <div class="bar">
       <span class="save"><span class="dot" id="wo-dot"></span><span id="wo-stat" role="status" aria-live="polite">Loading…</span></span>
       <div class="linkwrap">
@@ -651,8 +686,8 @@
     </div>
     <div id="wo-lockmsg" class="locked" style="display:none">This form has been locked by the WebOuts team and is now read-only. Contact us if something needs to change.</div>
 
-    <h1>Welcome! Let’s set up your profile videos</h1>
-    <p class="sub">This is how we get ready to film your providers. It takes about 10 minutes, and you don’t need every answer today. This works best as a team effort: copy your private link above and pass it around so the right person fills in each section. Everything saves as you go, so anyone can stop and pick up later.</p>
+    <h1 id="wo-welcome">Welcome! Let’s set up your profile videos</h1>
+    <p class="sub" id="wo-welcomesub">This is how we get ready to film your providers. It takes about 10 minutes, and you don’t need every answer today. This works best as a team effort: copy your private link above and pass it around so the right person fills in each section. Everything saves as you go, so anyone can stop and pick up later.</p>
 
     <div id="wo-form">
       <div class="sec" data-sec="org">
@@ -800,21 +835,50 @@
   var statEl = document.getElementById('wo-stat');
   var linkEl = document.getElementById('wo-link');
 
+  // A visit with no ?c= gets the splash instead of a live form. Landing straight on a
+  // working form meant every curious visitor and every staff member checking the page
+  // started a real onboarding, and the board filled up with junk records.
   var params = new URLSearchParams(location.search);
   var token = params.get('c');
-  if (!token) {
-    // A visit with no ?c= used to mint a brand new token every time, so anyone who
-    // opened the bare URL twice started two unrelated drafts and burned two of the
-    // ten tokens this IP is allowed each day. Reuse the one this browser already made.
-    try { token = localStorage.getItem('woOnbToken') || ''; } catch (e) { token = ''; }
-    if (!token) {
-      token = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
-    }
-    try { localStorage.setItem('woOnbToken', token); } catch (e) {}
-    params.set('c', token);
-    history.replaceState(null, '', location.pathname + '?' + params.toString());
+  var preview = false;
+  var splash = document.getElementById('wo-splash');
+
+  function saved(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  function remember(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function newToken() {
+    return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2);
   }
-  linkEl.textContent = location.href;
+  function looksLikeToken(s) { return /^[A-Za-z0-9-]{8,64}$/.test(s); }
+  // Accepts a full pasted URL or a bare token, so "paste your link" tolerates either.
+  function tokenFrom(raw) {
+    var s = String(raw || '').trim();
+    if (!s) return '';
+    var m = s.match(/[?&]c=([^&#\s]+)/);
+    if (m) s = decodeURIComponent(m[1]);
+    return looksLikeToken(s) ? s : '';
+  }
+  function showForm(t) {
+    token = t;
+    splash.style.display = 'none';
+    root.querySelector('.bar').style.display = '';
+    document.getElementById('wo-form').style.display = '';
+    document.getElementById('wo-welcome').style.display = '';
+    document.getElementById('wo-welcomesub').style.display = '';
+    params.set('c', t);
+    history.replaceState(null, '', location.pathname + '?' + params.toString());
+    linkEl.textContent = location.href;
+    loadForm(0);
+  }
+
+  if (!token) {
+    splash.style.display = '';
+    root.querySelector('.bar').style.display = 'none';
+    document.getElementById('wo-form').style.display = 'none';
+    document.getElementById('wo-welcome').style.display = 'none';
+    document.getElementById('wo-welcomesub').style.display = 'none';
+  } else {
+    linkEl.textContent = location.href;
+  }
 
   var fields = Array.prototype.slice.call(root.querySelectorAll('[data-key]'));
   var locked = false;
@@ -869,7 +933,7 @@
     if (box) { box.textContent = msg || 'Something went wrong, please contact WebOuts.'; box.style.display = 'block'; }
   }
   function doSave(extra) {
-    if (locked || halted || !loaded) return;
+    if (preview || locked || halted || !loaded) return;
     // Queueing used to drop `extra`, so clicking submit while a save was in flight
     // threw away the "Submitted for Review" stage and nothing told WebOuts they were done.
     if (saving) {
@@ -897,7 +961,7 @@
   // 3s rather than 1.2s: a whole client office shares one public IP, so every extra
   // request counts against limits they all share. A steady typist now costs a few
   // saves a minute instead of dozens, and the delay is invisible next to autosave.
-  function queueSave() { if (locked || halted || !loaded) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 3000); }
+  function queueSave() { if (preview || locked || halted || !loaded) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 3000); }
 
   // ---- generic auto-expanding table (rows -> " | "-joined lines in a hidden input) ----
   function tableCtl(cfg, bodyEl, valEl) {
@@ -1364,7 +1428,9 @@
     el.addEventListener('blur', function () { clearTimeout(saveTimer); doSave(); });
   });
   window.addEventListener('beforeunload', function () {
-    if (locked || halted || !loaded) return;
+    // preview first: this beacon is the one write that bypasses the UI entirely,
+    // and it has escaped request interception during testing before now.
+    if (preview || locked || halted || !loaded) return;
     // Only what this tab actually changed. A tab left open all day used to beacon its
     // whole morning snapshot on close, reverting everyone else's afternoon work.
     var data = changed();
@@ -1432,5 +1498,51 @@
         setSave('error', 'Couldn’t load your info — check your connection and refresh');
       });
   }
-  loadForm(0);
+  // ---- splash wiring ----
+  if (!token) {
+    var prior = saved('woOnbToken');
+    if (prior) {
+      document.getElementById('wo-splash-resume').style.display = '';
+      document.getElementById('wo-splash-resume-btn').addEventListener('click', function () { showForm(prior); });
+    }
+    document.getElementById('wo-splash-new').addEventListener('click', function () {
+      var t = newToken();
+      remember('woOnbToken', t);
+      showForm(t);
+    });
+    var errEl = document.getElementById('wo-splash-err');
+    function openPasted() {
+      var t = tokenFrom(document.getElementById('wo-splash-link').value);
+      if (!t) {
+        errEl.textContent = 'That doesn’t look like an onboarding link. It should look like https://webouts.com/onboarding?c=… — paste the whole thing.';
+        errEl.style.display = '';
+        return;
+      }
+      errEl.style.display = 'none';
+      showForm(t);
+    }
+    document.getElementById('wo-splash-open').addEventListener('click', openPasted);
+    document.getElementById('wo-splash-link').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); openPasted(); }
+    });
+    // Preview: render the form with no token at all, so there is nothing to save to.
+    // Every write path is also gated on `preview`, but an empty token means even a
+    // stray request would be refused by the API rather than land somewhere.
+    document.getElementById('wo-splash-peek').addEventListener('click', function () {
+      preview = true;
+      token = '';
+      splash.style.display = 'none';
+      document.getElementById('wo-previewmsg').style.display = '';
+      document.getElementById('wo-form').style.display = '';
+      document.getElementById('wo-welcome').style.display = '';
+      document.getElementById('wo-welcomesub').style.display = '';
+      gfxUp.disable(); brandUp.disable();
+      var sub = document.getElementById('wo-submit');
+      if (sub) { sub.disabled = true; sub.textContent = 'Submitting is off in preview'; }
+      loaded = true;
+      setSave('idle', 'Preview — nothing is saved');
+    });
+  } else {
+    loadForm(0);
+  }
 })();
