@@ -498,24 +498,25 @@
   /* ---- splash: shown only when the URL carries no ?c=, so an emailed link never sees it ----
      Everything animates on entrance with pure CSS delays; there is no JS timeline to
      fall out of sync, and prefers-reduced-motion turns the movement off wholesale. */
-  #wo-onb #wo-splash{position:relative;overflow:hidden;border-radius:22px;padding:64px 24px 56px;margin:0 auto 8px;max-width:760px;text-align:center;isolation:isolate}
-  #wo-onb .sp-glow{position:absolute;inset:-40% -20%;z-index:-1;pointer-events:none;
-    background:radial-gradient(38% 46% at 28% 32%,rgba(226,99,55,.16),transparent 70%),
-               radial-gradient(42% 50% at 74% 62%,rgba(7,55,140,.14),transparent 72%);
+  #wo-onb #wo-splash{position:relative;overflow:hidden;padding:clamp(48px,9vh,96px) 20px;
+    margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);width:auto;
+    min-height:clamp(460px,66vh,780px);display:flex;align-items:center;justify-content:center;text-align:center;isolation:isolate}
+  #wo-onb .sp-inner{max-width:640px;margin:0 auto;width:100%}
+  #wo-onb .sp-glow{position:absolute;inset:-25%;z-index:-1;pointer-events:none;
+    background:radial-gradient(34% 44% at 32% 34%,rgba(226,99,55,.20),transparent 70%),
+               radial-gradient(38% 48% at 70% 64%,rgba(7,55,140,.17),transparent 72%);
+    -webkit-mask-image:radial-gradient(ellipse 62% 68% at 50% 50%,#000 38%,transparent 78%);
+    mask-image:radial-gradient(ellipse 62% 68% at 50% 50%,#000 38%,transparent 78%);
     animation:sp-drift 22s ease-in-out infinite alternate}
   @keyframes sp-drift{from{transform:translate3d(-2%,-1%,0) scale(1)}to{transform:translate3d(3%,2%,0) scale(1.12)}}
   #wo-onb .sp-inner>*{opacity:0;animation:sp-rise .7s cubic-bezier(.16,.84,.44,1) forwards}
   @keyframes sp-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-  #wo-onb .sp-mark{width:58px;height:58px;display:block;margin:0 auto 22px;animation-delay:.05s}
-  #wo-onb .sp-ring{fill:none;stroke:#07378C;stroke-width:2.5;opacity:.28;
-    stroke-dasharray:170;stroke-dashoffset:170;transform-origin:50% 50%;transform:rotate(-90deg);
-    animation:sp-draw 1.5s cubic-bezier(.6,.05,.2,1) .25s forwards}
-  @keyframes sp-draw{to{stroke-dashoffset:0}}
-  #wo-onb .sp-play{fill:#E26337;opacity:0;transform-origin:32px 32px;
-    animation:sp-pop .6s cubic-bezier(.2,1.5,.4,1) 1.05s forwards}
-  @keyframes sp-pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+  #wo-onb .sp-logo{width:min(238px,62%);height:auto;display:block;margin:0 auto 30px;
+    animation-name:sp-logo!important;animation-duration:.9s;animation-delay:.05s}
+  @keyframes sp-logo{from{opacity:0;transform:translateY(10px) scale(.965)}to{opacity:1;transform:none}}
   #wo-onb .sp-title{font-size:34px;line-height:1.15;color:#07378C;margin:0 0 14px;letter-spacing:-.02em;animation-delay:.18s}
-  #wo-onb .sp-sub{font-size:16.5px;line-height:1.6;color:#5a6472;margin:0 auto 34px;max-width:46ch;animation-delay:.28s}
+  #wo-onb .sp-sub{font-size:16px;line-height:1.62;color:#5a6472;margin:0 auto 14px;max-width:52ch;animation-delay:.28s}
+  #wo-onb .sp-sub2{margin-bottom:34px;animation-delay:.34s}
   #wo-onb .sp-actions{display:flex;flex-direction:column;align-items:center;gap:16px;animation-delay:.38s}
   #wo-onb .sp-cta{position:relative;overflow:hidden;background:#E26337;color:#fff;border:0;border-radius:999px;
     padding:15px 38px;font:600 16px/1 inherit;cursor:pointer;box-shadow:0 8px 22px rgba(226,99,55,.28);
@@ -528,9 +529,10 @@
     background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);
     animation:sp-sheen 4.5s ease-in-out 1.6s infinite}
   @keyframes sp-sheen{0%{left:-60%}45%{left:130%}100%{left:130%}}
-  #wo-onb .sp-quiet{background:none;border:0;padding:4px 2px;color:#07378C;font:inherit;font-size:14.5px;cursor:pointer;
-    border-bottom:1px solid rgba(7,55,140,.28);transition:border-color .2s,color .2s}
-  #wo-onb .sp-quiet:hover{color:#E26337;border-bottom-color:rgba(226,99,55,.5)}
+  #wo-onb .sp-quiet{background:none;border:0;padding:2px;color:#07378C;font:inherit;font-size:14.5px;cursor:pointer;
+    text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;
+    text-decoration-color:rgba(7,55,140,.3);transition:color .2s,text-decoration-color .2s}
+  #wo-onb .sp-quiet:hover{color:#E26337;text-decoration-color:rgba(226,99,55,.6)}
   /* opacity:1 is load-bearing: .sp-inner>* sets opacity:0 for the entrance, and this
      animation has no fill mode, so without it the revealed field lands back invisible. */
   #wo-onb .sp-paste{max-width:440px;margin:22px auto 0;opacity:1;animation:sp-open .45s cubic-bezier(.16,.84,.44,1)}
@@ -543,17 +545,19 @@
   #wo-onb .sp-err{margin-top:10px;font-size:13.5px;color:#b3411f;text-align:left}
   #wo-onb #wo-splash-resume{margin-top:20px;animation-delay:.46s}
   #wo-onb .sp-foot{margin:38px 0 0;animation-delay:.54s}
-  #wo-onb .sp-foot .sp-quiet{font-size:13.5px;color:#7a8494;border-bottom-color:rgba(122,132,148,.3)}
+  #wo-onb .sp-foot .sp-quiet{font-size:13.5px;color:#7a8494;text-decoration-color:rgba(122,132,148,.35)}
   @media (max-width:600px){
     #wo-onb #wo-splash{padding:44px 16px 40px}
     #wo-onb .sp-title{font-size:27px}
-    #wo-onb .sp-sub{font-size:15.5px;margin-bottom:28px}
+    #wo-onb .sp-sub{font-size:15px}
+    #wo-onb .sp-sub2{margin-bottom:26px}
+    #wo-onb .sp-logo{margin-bottom:24px}
     #wo-onb .sp-cta{width:100%}
     #wo-onb .sp-row{flex-direction:column}
     #wo-onb .sp-go{width:100%}
   }
   @media (prefers-reduced-motion:reduce){
-    #wo-onb .sp-inner>*,#wo-onb .sp-ring,#wo-onb .sp-play,#wo-onb .sp-glow,#wo-onb .sp-paste{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}
+    #wo-onb .sp-inner>*,#wo-onb .sp-logo,#wo-onb .sp-glow,#wo-onb .sp-paste{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}
     #wo-onb .sp-cta::after{animation:none;display:none}
     #wo-onb .sp-cta:hover{transform:none}
   }
@@ -706,12 +710,10 @@
     <div id="wo-splash" style="display:none">
       <div class="sp-glow" aria-hidden="true"></div>
       <div class="sp-inner">
-        <svg class="sp-mark" viewBox="0 0 64 64" aria-hidden="true">
-          <circle class="sp-ring" cx="32" cy="32" r="27"></circle>
-          <path class="sp-play" d="M26 21.5 L44 32 L26 42.5 Z"></path>
-        </svg>
-        <h1 class="sp-title">Welcome to WebOuts</h1>
-        <p class="sp-sub">Let’s get your providers ready for camera. About ten minutes, and you don’t need every answer today.</p>
+        <img class="sp-logo" src="https://webouts.com/wp-content/uploads/2022/03/WebOuts-crop-Logo.png" alt="WebOuts, Medical Media Specialists" width="719" height="230">
+        <h1 class="sp-title">Let’s get your profile videos started</h1>
+        <p class="sp-sub">This form gathers everything we need to produce your physician profile videos: your key contacts, the providers you’d like to film, how the videos should look and sound, your brand assets, and your filming logistics.</p>
+        <p class="sp-sub sp-sub2">Work through it in any order and answer what you can. Everything saves as you type, and you’ll get a private link you can pass around your team and come back to any time.</p>
         <div class="sp-actions">
           <button type="button" class="sp-cta" id="wo-splash-new"><span>Start a new onboarding</span></button>
           <button type="button" class="sp-quiet" id="wo-splash-have" aria-expanded="false" aria-controls="wo-splash-paste">I already have a link</button>
