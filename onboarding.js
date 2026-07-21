@@ -785,13 +785,23 @@
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
-  function collect() {
-    var data = {};
+  // What the server held when this tab last synced. Saves send only what differs from
+  // it, so two people editing different sections cannot revert each other: a tab that
+  // never touched section 3 never sends section 3. An empty string means "cleared",
+  // which is also the only way a deletion reaches storage.
+  var baseline = {};
+  function changed() {
+    var out = {};
     fields.forEach(function (el) {
       var k = el.getAttribute('data-key');
-      if (el.value !== '') data[k] = el.value;
+      var now = el.value;
+      var was = baseline[k] == null ? '' : String(baseline[k]);
+      if (now !== was) out[k] = now;
     });
-    return data;
+    return out;
+  }
+  function syncBaseline(sent) {
+    Object.keys(sent || {}).forEach(function (k) { baseline[k] = sent[k]; });
   }
   function apply(data) {
     fields.forEach(function (el) {
@@ -803,10 +813,15 @@
 
   function postJSON(url, body) {
     return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      .then(function (r) { return r.json(); });
+      .then(function (r) {
+        // A 500 with a JSON body used to parse fine and read as success, so the form
+        // said "All changes saved" having written nothing. Treat it as the failure it is.
+        if (!r.ok) { var e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
+        return r.json();
+      });
   }
 
-  var saveTimer = null, saving = false, pending = false, halted = false;
+  var saveTimer = null, saving = false, pending = false, pendingExtra = null, halted = false;
   // The API refuses to save when it cannot read the stored answers, rather than
   // merging over them. Stop everything and say so instead of looping on the error.
   function halt(msg) {
@@ -817,18 +832,29 @@
   }
   function doSave(extra) {
     if (locked || halted || !loaded) return;
-    if (saving) { pending = true; return; }
-    saving = true; setSave('saving', 'Saving…');
-    var data = collect();
+    // Queueing used to drop `extra`, so clicking submit while a save was in flight
+    // threw away the "Submitted for Review" stage and nothing told WebOuts they were done.
+    if (saving) {
+      pending = true;
+      if (extra) pendingExtra = Object.assign(pendingExtra || {}, extra);
+      return;
+    }
+    var data = changed();
     if (extra) Object.keys(extra).forEach(function (k) { data[k] = extra[k]; });
+    if (!Object.keys(data).length) { setSave('saved', 'All changes saved'); return; }
+    saving = true; setSave('saving', 'Saving…');
     postJSON(API, { action: 'save', token: token, data: data })
       .then(function (res) {
-        if (res && res.ok === false) { halt(res.error); return; }
-        if (res && res.itemId) itemId = res.itemId;
+        if (!res || res.ok !== true) { halt(res && res.error); return; }
+        if (res.itemId) itemId = res.itemId;
+        syncBaseline(data);
         setSave('saved', 'All changes saved');
       })
       .catch(function () { setSave('error', 'Couldn’t save, check your connection'); })
-      .finally(function () { saving = false; if (pending) { pending = false; doSave(); } });
+      .finally(function () {
+        saving = false;
+        if (pending) { pending = false; var e = pendingExtra; pendingExtra = null; doSave(e); }
+      });
   }
   function queueSave() { if (locked || halted || !loaded) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
 
@@ -839,7 +865,9 @@
       var lines = [];
       Array.prototype.forEach.call(bodyEl.querySelectorAll('tr'), function (tr) {
         if (rowEmpty(tr)) return;
-        var vals = Array.prototype.map.call(tr.querySelectorAll('input'), function (i) { return i.value.trim().replace(/ \| /g, ' / '); });
+        // Any pipe, not just " | ": a value ending in "|" slipped through and shifted
+        // every later column one place on the way back in.
+        var vals = Array.prototype.map.call(tr.querySelectorAll('input'), function (i) { return i.value.trim().replace(/\|/g, '/'); });
         lines.push(vals.join(' | '));
       });
       valEl.value = lines.join('\n');
@@ -895,10 +923,20 @@
   });
 
   // Make sure a row exists (and we know its id) before attaching a file.
+  // Selecting several files fires this once per file, synchronously. Without sharing
+  // one in-flight promise they each saw a null itemId and created their own record,
+  // leaving duplicate board items with the uploads split between them.
+  var itemPromise = null;
   function ensureItem() {
     if (itemId) return Promise.resolve(itemId);
-    return postJSON(API, { action: 'save', token: token, data: collect() })
-      .then(function (res) { if (res && res.itemId) itemId = res.itemId; return itemId; });
+    if (itemPromise) return itemPromise;
+    itemPromise = postJSON(API, { action: 'save', token: token, data: changed() })
+      .then(function (res) {
+        if (res && res.itemId) itemId = res.itemId;
+        return itemId;
+      })
+      .finally(function () { itemPromise = null; });
+    return itemPromise;
   }
   function readB64(file) {
     return new Promise(function (resolve, reject) {
@@ -1285,8 +1323,12 @@
     el.addEventListener('blur', function () { clearTimeout(saveTimer); doSave(); });
   });
   window.addEventListener('beforeunload', function () {
-    if (locked || !loaded) return;
-    try { navigator.sendBeacon(API, new Blob([JSON.stringify({ action: 'save', token: token, data: collect() })], { type: 'application/json' })); } catch (e) {}
+    if (locked || halted || !loaded) return;
+    // Only what this tab actually changed. A tab left open all day used to beacon its
+    // whole morning snapshot on close, reverting everyone else's afternoon work.
+    var data = changed();
+    if (!Object.keys(data).length) return;
+    try { navigator.sendBeacon(API, new Blob([JSON.stringify({ action: 'save', token: token, data: data })], { type: 'application/json' })); } catch (e) {}
   });
 
   document.getElementById('wo-copy').addEventListener('click', function () {
@@ -1314,13 +1356,15 @@
   }
 
   function handleLoad(res) {
-    if (res && res.ok === false) { // do not render a blank form over answers we failed to read
+    if (!res || res.ok !== true) { // never render a blank form over answers we failed to read
       loaded = false;
-      halt(res.error);
+      halt(res && res.error);
       fields.forEach(function (el) { el.disabled = true; });
       return;
     }
-    var data = (res && res.data) || {};
+    var data = res.data || {};
+    baseline = {};
+    Object.keys(data).forEach(function (k) { baseline[k] = data[k] == null ? '' : String(data[k]); });
     if (res && res.itemId) itemId = res.itemId;
     apply(data);
     Object.keys(TABLES).forEach(function (id) { tableCtls[id].build(data[TABLES[id].key] || ''); });
@@ -1328,7 +1372,9 @@
     brandUp.load(data['brandGuide.files']);
     applyDone(data._done);
     applyDue(res && res.due);
-    lockIfNeeded(data._stage);
+    // Read the real Monday Stage, not the copy in the blob. The blob only ever held
+    // 'Submitted for Review', so a staff lock never actually reached the client.
+    lockIfNeeded(res.stage || data._stage);
     var has = Object.keys(data).length > 0;
     loaded = true;
     if (locked) setSave('idle', 'Locked');
