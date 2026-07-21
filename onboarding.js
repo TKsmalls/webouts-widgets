@@ -587,7 +587,9 @@
   #wo-onb .sec.filled .check{background:#2F8F5C;border-color:#2F8F5C;color:#fff}
   #wo-onb .sec.filled .done-label{color:#2F8F5C}
   #wo-onb .sec .due{flex:0 0 auto;font-size:11px;font-weight:700;letter-spacing:.3px;color:#07378C;background:#eef2fb;border:1px solid #d6e3ff;border-radius:20px;padding:3px 9px;white-space:nowrap}
-  #wo-onb .sec .due.past{color:#b3411f;background:#FDEFE9;border-color:#f3c9bb}
+  /* traffic light: overdue or inside a week red, inside a fortnight amber, else blue */
+  #wo-onb .sec .due.past,#wo-onb .sec .due.soon{color:#b3411f;background:#FDEFE9;border-color:#f3c9bb}
+  #wo-onb .sec .due.warn{color:#8a5a00;background:#FFF6E3;border-color:#f2dca6}
   #wo-onb .sec .due.none{color:#9aa3b0;background:transparent;border:1px dashed #dbe1e9;font-weight:500}
   #wo-onb .sec .chev{width:9px;height:9px;border-right:2px solid #9aa4b4;border-bottom:2px solid #9aa4b4;transform:rotate(-45deg);transition:transform .2s ease;flex:0 0 auto;margin-top:-3px}
   #wo-onb .sec.open .chev{transform:rotate(45deg)}
@@ -1250,8 +1252,12 @@
       var el = document.createElement('span');
       if (v) {
         var now = new Date();
-        var today = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
-        el.className = 'due' + ((v.y * 10000 + v.m * 100 + v.d) < today ? ' past' : '');
+        // Whole days between calendar dates, via UTC midnights so a clock change
+        // cannot make a deadline look a day nearer or further than it is.
+        var days = Math.round((Date.UTC(v.y, v.m - 1, v.d) -
+                               Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
+        // Within a week red, within a fortnight amber, further out blue.
+        el.className = 'due' + (days < 0 ? ' past' : days <= 7 ? ' soon' : days <= 14 ? ' warn' : '');
         el.textContent = 'Deadline ' + MON[v.m - 1] + ' ' + v.d + (v.y === now.getFullYear() ? '' : ', ' + v.y);
       } else {
         // Undated sections keep the slot rather than leaving a gap, so headers stay
