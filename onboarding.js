@@ -566,6 +566,13 @@
     #wo-onb .sp-cta::after{animation:none;display:none}
     #wo-onb .sp-cta:hover{transform:none}
   }
+  #wo-onb #wo-loading{position:relative;overflow:hidden;padding:clamp(48px,9vh,96px) 20px;
+    margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);
+    min-height:clamp(380px,52vh,620px);display:flex;align-items:center;justify-content:center;text-align:center;isolation:isolate}
+  #wo-onb .ld-bar{width:min(260px,70%);height:4px;margin:6px auto 0;border-radius:4px;background:rgba(7,55,140,.12);overflow:hidden}
+  #wo-onb .ld-bar>span{display:block;width:40%;height:100%;border-radius:4px;background:#E26337;animation:ld-slide 1.25s ease-in-out infinite}
+  @keyframes ld-slide{0%{transform:translateX(-110%)}100%{transform:translateX(310%)}}
+  @media (prefers-reduced-motion:reduce){ #wo-onb .ld-bar>span{animation:none;width:100%} }
   #wo-onb .locked{background:#FFF4EF;border:1px solid #f3c9bb;border-radius:11px;padding:14px 16px;color:#7a2e12;margin-bottom:18px;font-size:14px}
   #wo-onb .done{text-align:center;padding:48px 16px}
   #wo-onb .done h1{font-size:28px}
@@ -735,6 +742,15 @@
           <div class="sp-err" id="wo-splash-err" style="display:none"></div>
         </div>
         <p class="sp-foot"><button type="button" class="sp-quiet" id="wo-splash-peek">Preview the form without saving anything</button></p>
+      </div>
+    </div>
+    <div id="wo-loading" style="display:none">
+      <div class="sp-glow" aria-hidden="true"></div>
+      <div class="sp-inner">
+        <img class="sp-logo" src="https://webouts.com/wp-content/uploads/2022/03/WebOuts-crop-Logo.png" alt="WebOuts" width="719" height="230">
+        <h1 class="sp-title">Grabbing your information</h1>
+        <p class="sp-sub" role="status" aria-live="polite">One moment. Nothing has been lost, we are just fetching everything you have saved so far.</p>
+        <div class="ld-bar" aria-hidden="true"><span></span></div>
       </div>
     </div>
     <div id="wo-previewmsg" class="locked" style="display:none"><strong>Preview mode.</strong> Nothing you type here is saved and no record is created. To fill this in for real, reload the page and start a new onboarding.</div>
@@ -919,13 +935,30 @@
     if (m) s = decodeURIComponent(m[1]);
     return looksLikeToken(s) ? s : '';
   }
-  function showForm(t) {
-    token = t;
-    splash.style.display = 'none';
+  // An empty form rendered while the answers are still in flight looks exactly like
+  // lost data, which is the one thing this form must never look like. Hide it from the
+  // first frame, and show the "grabbing your information" panel only if the wait is long
+  // enough to notice, so a fast load does not flash a loading screen at anyone.
+  var loadTimer = null;
+  function startLoading() {
+    var chrome = ['wo-form', 'wo-welcome', 'wo-welcomesub'];
+    chrome.forEach(function (id) { document.getElementById(id).style.display = 'none'; });
+    root.querySelector('.bar').style.display = 'none';
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(function () { document.getElementById('wo-loading').style.display = ''; }, 180);
+  }
+  function endLoading() {
+    clearTimeout(loadTimer);
+    document.getElementById('wo-loading').style.display = 'none';
     root.querySelector('.bar').style.display = '';
     document.getElementById('wo-form').style.display = '';
     document.getElementById('wo-welcome').style.display = '';
     document.getElementById('wo-welcomesub').style.display = '';
+  }
+  function showForm(t) {
+    token = t;
+    splash.style.display = 'none';
+    startLoading();
     params.set('c', t);
     history.replaceState(null, '', location.pathname + '?' + params.toString());
     linkEl.textContent = location.href;
@@ -940,6 +973,7 @@
     document.getElementById('wo-welcomesub').style.display = 'none';
   } else {
     linkEl.textContent = location.href;
+    startLoading();
   }
 
   var fields = Array.prototype.slice.call(root.querySelectorAll('[data-key]'));
@@ -1558,6 +1592,7 @@
   }
 
   function handleLoad(res) {
+    endLoading();
     if (!res || res.ok !== true) { // never render a blank form over answers we failed to read
       loaded = false;
       halt(res && res.error);
@@ -1590,6 +1625,7 @@
       .then(handleLoad)
       .catch(function () {
         if (attempt < 2) { setTimeout(function () { loadForm(attempt + 1); }, 700 * (attempt + 1)); return; }
+        endLoading(); // give them the form back rather than leaving them on a spinner
         loaded = true; // let the client still work; sparse saves won't clobber stored data
         setSave('error', 'Couldn’t load your info — check your connection and refresh');
       });
