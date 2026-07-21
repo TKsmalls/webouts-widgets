@@ -806,19 +806,31 @@
       .then(function (r) { return r.json(); });
   }
 
-  var saveTimer = null, saving = false, pending = false;
+  var saveTimer = null, saving = false, pending = false, halted = false;
+  // The API refuses to save when it cannot read the stored answers, rather than
+  // merging over them. Stop everything and say so instead of looping on the error.
+  function halt(msg) {
+    halted = true;
+    setSave('error', msg || 'Something went wrong, please contact WebOuts');
+    var box = document.getElementById('wo-lockmsg');
+    if (box) { box.textContent = msg || 'Something went wrong, please contact WebOuts.'; box.style.display = 'block'; }
+  }
   function doSave(extra) {
-    if (locked || !loaded) return;
+    if (locked || halted || !loaded) return;
     if (saving) { pending = true; return; }
     saving = true; setSave('saving', 'Saving…');
     var data = collect();
     if (extra) Object.keys(extra).forEach(function (k) { data[k] = extra[k]; });
     postJSON(API, { action: 'save', token: token, data: data })
-      .then(function (res) { if (res && res.itemId) itemId = res.itemId; setSave('saved', 'All changes saved'); })
+      .then(function (res) {
+        if (res && res.ok === false) { halt(res.error); return; }
+        if (res && res.itemId) itemId = res.itemId;
+        setSave('saved', 'All changes saved');
+      })
       .catch(function () { setSave('error', 'Couldn’t save, check your connection'); })
       .finally(function () { saving = false; if (pending) { pending = false; doSave(); } });
   }
-  function queueSave() { if (locked || !loaded) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
+  function queueSave() { if (locked || halted || !loaded) return; clearTimeout(saveTimer); setSave('saving', 'Editing…'); saveTimer = setTimeout(doSave, 1200); }
 
   // ---- generic auto-expanding table (rows -> " | "-joined lines in a hidden input) ----
   function tableCtl(cfg, bodyEl, valEl) {
@@ -1302,6 +1314,12 @@
   }
 
   function handleLoad(res) {
+    if (res && res.ok === false) { // do not render a blank form over answers we failed to read
+      loaded = false;
+      halt(res.error);
+      fields.forEach(function (el) { el.disabled = true; });
+      return;
+    }
     var data = (res && res.data) || {};
     if (res && res.itemId) itemId = res.itemId;
     apply(data);
