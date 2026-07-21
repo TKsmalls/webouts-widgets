@@ -613,7 +613,7 @@
   #wo-onb .wo-cs-grp.open .wo-cs-grid{display:flex}
   #wo-onb .wo-cs-card{position:relative;flex:1 1 195px;min-width:170px;max-width:100%;box-sizing:border-box;border:1px solid #e6e9ef;border-radius:11px;background:#fff;padding:13px 14px;text-align:left;cursor:pointer;font-family:inherit;font-weight:400;font-size:14px;transition:border-color .15s,box-shadow .15s,transform .15s}
   #wo-onb .wo-cs-card:hover,#wo-onb .wo-cs-card:focus-visible{border-color:#07378C;box-shadow:0 8px 22px rgba(7,55,140,.13);transform:translateY(-1px);outline:none}
-  #wo-onb .wo-cs-card>span,#wo-onb .wo-cs-tip>span{display:block}
+  #wo-onb .wo-cs-card>span{display:block}
   #wo-onb .wo-cs-card>span.wo-cs-tags{display:flex;flex-wrap:wrap;gap:5px}
   #wo-onb .wo-cs-tag{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:3px 7px;border-radius:5px;white-space:nowrap}
   #wo-onb .wo-cs-tag.email{background:#eef2fb;color:#07378C}
@@ -624,16 +624,6 @@
   #wo-onb .wo-cs-w{font-size:11.5px;color:#9aa4b4;margin-top:8px}
   #wo-onb .wo-cs-open{font-size:11.5px;font-weight:700;color:#E26337;margin-top:8px}
   /* hover preview */
-  #wo-onb .wo-cs-tip{position:absolute;left:50%;bottom:calc(100% + 11px);width:250px;transform:translateX(-50%) translateY(8px);background:#fff;border:1px solid #e3e9f3;border-radius:12px;box-shadow:0 14px 36px rgba(10,57,154,.22);padding:12px 13px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:60;text-align:left}
-  #wo-onb .wo-cs-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top-color:#fff}
-  #wo-onb .wo-cs-card:hover .wo-cs-tip,#wo-onb .wo-cs-card:focus-visible .wo-cs-tip{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
-  #wo-onb .wo-cs-tips{font-size:11px;font-weight:700;color:#8a93a3;text-transform:uppercase;letter-spacing:.4px;margin:0 0 5px}
-  #wo-onb .wo-cs-tipb{font-size:12px;color:#4b5563;line-height:1.5;white-space:pre-wrap}
-  /* not enough room above the card, so the preview flips underneath it */
-  #wo-onb .wo-cs-card.tip-below .wo-cs-tip{bottom:auto;top:calc(100% + 11px);transform:translateX(-50%) translateY(-8px)}
-  #wo-onb .wo-cs-card.tip-below:hover .wo-cs-tip,#wo-onb .wo-cs-card.tip-below:focus-visible .wo-cs-tip{transform:translateX(-50%) translateY(0)}
-  #wo-onb .wo-cs-card.tip-below .wo-cs-tip::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#fff}
-  #wo-onb .wo-cs-tipf{font-size:11px;color:#9aa4b4;margin-top:7px}
   /* modal */
   #wo-onb .wo-cs-ov{position:fixed;inset:0;background:rgba(16,24,40,.62);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
   #wo-onb .wo-cs-ov[hidden]{display:none}
@@ -695,7 +685,6 @@
     #wo-onb .sec.has-due .done-label{display:none}
     /* the placeholder is an alignment aid; on a phone it would just wrap the title */
     #wo-onb .sec .due.none{display:none}
-    #wo-onb .wo-cs-card>span.wo-cs-tip{display:none}
     #wo-onb .wo-cs-card{flex:1 1 100%}
     #wo-onb .wo-cs-ov{padding:12px 8px}
   }
@@ -1382,11 +1371,6 @@
     if (s.sentBy !== 'WebOuts') h += '<span class="wo-cs-tag you">You send this</span>';
     return h;
   }
-  function previewText(s) {
-    var t = s.channel === 'sms' ? fillText(s.body)
-      : fillText(String(s.body).replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
-    return t.length > 210 ? t.slice(0, 210).replace(/\s\S*$/, '') + '…' : t;
-  }
   function cardHTML(s) {
     return '<button type="button" class="wo-cs-card" data-id="' + esc(s.id) + '">'
       + '<span class="wo-cs-tags">' + tagsHTML(s) + '</span>'
@@ -1394,11 +1378,7 @@
       + '<span class="wo-cs-b">' + esc(s.blurb) + '</span>'
       + '<span class="wo-cs-w">' + esc(s.timing) + '</span>'
       + '<span class="wo-cs-open">Click to read it &rsaquo;</span>'
-      + '<span class="wo-cs-tip" aria-hidden="true">'
-      + '<span class="wo-cs-tips">' + (s.channel === 'sms' ? 'Text message' : 'Subject') + '</span>'
-      + '<span class="wo-cs-tipb">' + esc(s.channel === 'sms' ? previewText(s) : fillText(s.subject)) + '</span>'
-      + '<span class="wo-cs-tipf">' + (s.channel === 'sms' ? 'Click to read it' : 'Click to read the whole email') + '</span>'
-      + '</span></button>';
+      + '</button>';
   }
   var listEl = document.getElementById('wo-cs-list');
   function renderSamples() {
@@ -1464,24 +1444,6 @@
     document.body.style.overflow = '';
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
-  // The preview sits above its card by default, which clips against the top of
-  // the window on the first row. Flip it below when there is more room there.
-  function placeTip(card) {
-    var tip = card.querySelector('.wo-cs-tip');
-    if (!tip) return;
-    var r = card.getBoundingClientRect();
-    var h = tip.offsetHeight || 120;
-    card.classList.toggle('tip-below', r.top < h + 24 && (window.innerHeight - r.bottom) > r.top);
-  }
-  listEl.addEventListener('mouseover', function (e) {
-    var card = e.target.closest && e.target.closest('.wo-cs-card');
-    if (card) placeTip(card);
-  });
-  listEl.addEventListener('focusin', function (e) {
-    var card = e.target.closest && e.target.closest('.wo-cs-card');
-    if (card) placeTip(card);
-  });
-
   listEl.addEventListener('click', function (e) {
     if (!e.target.closest) return;
     var head = e.target.closest('.wo-cs-grph');
