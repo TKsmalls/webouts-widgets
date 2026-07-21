@@ -1215,6 +1215,31 @@
       sec.classList.add('has-due'); // narrow screens drop the "Completed" wording to make room
     });
   }
+  // Once WebOuts sets due dates, the form reorders itself to match: soonest first,
+  // then anything undated in its original order. The visible numbers are rewritten to
+  // the new positions, otherwise the client reads "1, 5, 2" and assumes it is broken.
+  // Safe to move the nodes because every section declares its own data-sec slug, so
+  // due dates and saved _done state follow the section rather than its position.
+  function reorderByDue(due) {
+    due = due || {};
+    if (!Object.keys(due).length) return; // no dates set, leave the authored order alone
+    var form = document.getElementById('wo-form');
+    var submit = document.getElementById('wo-submit');
+    var order = secs.map(function (sec, i) {
+      var v = dueParts(due[sec.getAttribute('data-sec')]);
+      return { sec: sec, i: i, key: v ? (v.y * 10000 + v.m * 100 + v.d) : Infinity };
+    });
+    // Infinity !== Infinity is false, so undated sections fall through to original order.
+    order.sort(function (a, b) { return a.key !== b.key ? (a.key < b.key ? -1 : 1) : a.i - b.i; });
+    order.forEach(function (o, idx) {
+      form.insertBefore(o.sec, submit); // before the submit button, which stays last
+      var n = o.sec.querySelector('h2 .num');
+      if (n) n.textContent = String(idx + 1);
+      o.sec.classList.toggle('open', idx === 0);
+      var h = o.sec.querySelector('h2');
+      if (h) h.setAttribute('aria-expanded', idx === 0 ? 'true' : 'false');
+    });
+  }
   function applyDone(str) {
     doneSecs = {};
     String(str || '').split(',').filter(Boolean).forEach(function (slug) { doneSecs[slug] = 1; });
@@ -1533,6 +1558,7 @@
     brandUp.load(data['brandGuide.files']);
     applyDone(data._done);
     applyDue(res && res.due);
+    reorderByDue(res && res.due);
     // Read the real Monday Stage, not the copy in the blob. The blob only ever held
     // 'Submitted for Review', so a staff lock never actually reached the client.
     lockIfNeeded(res.stage || data._stage);
