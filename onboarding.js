@@ -772,7 +772,14 @@
   var params = new URLSearchParams(location.search);
   var token = params.get('c');
   if (!token) {
-    token = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
+    // A visit with no ?c= used to mint a brand new token every time, so anyone who
+    // opened the bare URL twice started two unrelated drafts and burned two of the
+    // ten tokens this IP is allowed each day. Reuse the one this browser already made.
+    try { token = localStorage.getItem('woOnbToken') || ''; } catch (e) { token = ''; }
+    if (!token) {
+      token = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2));
+    }
+    try { localStorage.setItem('woOnbToken', token); } catch (e) {}
     params.set('c', token);
     history.replaceState(null, '', location.pathname + '?' + params.toString());
   }
