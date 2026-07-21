@@ -1,6 +1,7 @@
 /* WebOuts Client Onboarding widget, deployed via GitHub + jsDelivr.
  * The Bricks page only holds a tiny loader (see onboarding-loader.html).
- * Edit this file, push to GitHub, purge jsDelivr, the live page updates.
+ * The page serves the "live" branch, NOT main, so pushing to main changes nothing
+ * for clients. Publish with: git push origin main:live --force-with-lease
  * No secrets here; it posts to the public n8n onboarding API. */
 (function () {
   var API = "https://webouts.app.n8n.cloud/webhook/onboarding-api";
