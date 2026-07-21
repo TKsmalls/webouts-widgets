@@ -17,6 +17,24 @@ is where work accumulates, so a half-finished commit on `main` never reaches a
 client. Publishing is a separate, deliberate step, and it doubles as the rollback
 mechanism.
 
+## ⚠️ Current state: the page still reads `main`
+
+The loader in this repo points at `live`, but the loader **actually pasted on
+webouts.com still points at `main`**. Bricks signs its code elements, and that
+signature covers the exact code bytes. A signature cannot be minted outside the
+Bricks builder, so changing that code through the API would leave the element
+unsigned and the page blank.
+
+**To finish the switch** (about 30 seconds, and the page is never broken, because
+saving in the builder re-signs atomically): open the Bricks builder on
+`webouts.com/onboarding`, select the Code element, replace its contents with
+`onboarding-loader.html` from this repo, and save.
+
+Until that happens, **push to both branches** so the page is correct either way:
+```
+git push origin main && git push origin main:live --force-with-lease
+```
+
 ## To push an update
 1. Edit `onboarding.js` and commit to `main`.
 2. Publish:
