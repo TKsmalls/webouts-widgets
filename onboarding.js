@@ -43,17 +43,19 @@
   // client sends it themselves, which is why it carries sentBy + copyable.
   var SAMPLES = [
     {
-      "id": "cam-concierge-intro",
+      "id": "org-kickoff-announcement",
       "channel": "email",
-      "stage": "kickoff",
-      "sentBy": "WebOuts",
+      "stage": "announce",
+      "sentBy": "Your organization",
       "audience": "Provider",
-      "title": "Concierge Intro",
-      "blurb": "Arrives minutes after a provider books, introducing their personal point of contact.",
-      "timing": "Immediately after booking is confirmed",
-      "from": "Cam Kubasta <ckubasta@webouts.com>",
-      "subject": "A quick hello from your {{org}} Physician Profile concierge",
-      "body": "<h2>You're Booked, and in Good Hands</h2>\n<p>A personal hello from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Hi, I'm <strong>Cam Kubasta</strong> with WebOuts Medical Media. Now that your {{org}} script interview and filming are on the calendar, I wanted to introduce myself. Think of me as your {{org}} Physician Profile concierge.</p>\n\n<p>My goal is simple: to make this process completely effortless for you. If a question comes up or you just want to talk something through, reach out anytime. I'm always glad to help.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR APPOINTMENTS</strong></p>\n  <ul>\n    <li><strong>SCRIPTING</strong> {{date}} at {{time}}</li>\n    <li><strong>FILMING</strong> {{date}} at {{time}}, {{filmingLocation}}</li>\n  </ul>\n  <p>Times shown in your local timezone.</p>\n</div>\n\n<p>Most of all, whatever you need along the way, consider me your direct line.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>MY CONTACT INFORMATION</strong></p>\n  <p>Call or text me anytime.</p>\n  <p>Email: <a href=\"#\">ckubasta@webouts.com</a></p>\n</div>\n\n<p>Looking forward to working with you,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media</p>"
+      "copyable": true,
+      "title": "Kickoff announcement",
+      "blurb": "Announces the project and asks each provider to book both appointments.",
+      "timing": "At project launch, to every provider",
+      "from": "{{sender}}",
+      "to": "Dr. {{providerLastName}}",
+      "subject": "Action Needed: Schedule Your Physician Profile Video",
+      "body": "<p>Hello Dr. {{providerLastName}},</p>\n<p>It is time to schedule your video bio for {{org}}. It will appear on your website profile and the {{org}} YouTube page. Physician video bios can increase patient calls and inquiries by nearly 60%.</p>\n<p>These videos give patients a personal introduction to you before their first visit. They help patients get to know you, understand your care philosophy, and feel more confident reaching out.</p>\n<p>{{org}} has partnered with WebOuts Medical Media, a production company that specializes in healthcare videos.</p>\n<p>Booking your appointments takes just 2 to 3 minutes, and calendar invitations will be sent automatically once scheduled:<br><a href=\"#\">{{bookingLink}}</a></p>\n<p>Please schedule <strong>both</strong> your 20-minute script interview and 1-hour filming appointment. Be sure to choose a filming date that is at least two weeks after your script interview to allow time for script preparation and review.</p>\n<p>A professional writer will use your script interview to prepare a custom script for your review. Filming takes place at {{filmingLocation}} and lasts about one hour. Throughout the process, you will be coached on how to easily and authentically tell your story.</p>\n<p>Example video: <a href=\"#\">{{sampleVideo}}</a></p>\n<p>When scheduling your script call and filming date, please include your practice manager and {{contact}}.</p>"
     },
     {
       "id": "fomo-1",
@@ -121,6 +123,89 @@
       "body": "<h2>Filming Slots Remaining</h2>\n<p>Filming {{date}}</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>This is our final reminder about your {{org}} physician profile video. If we don't hear from you, we'll hand scheduling back to {{org}} leadership, who will follow up with you and your admin directly. <strong>Slots are still open</strong> if you'd like to grab one.</p>\n\n<p>If someone on your team handles scheduling, feel free to forward this email so they can book on your behalf.</p>\n\n<div class=\"wo-ml-card\">\n  <ul>\n    <li><strong>WHAT</strong> A <strong>20-minute phone call script interview</strong> plus a <strong>1-hour filming session</strong></li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n    <li><strong>WHEN</strong> {{date}}</li>\n    <li><strong>NOTE</strong> Choose a filming date at least <strong>two weeks</strong> after your script interview, so there is time for script prep and review.</li>\n  </ul>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Schedule Interview &amp; Filming</a></p>\n\n<p>Questions? Just reply to this email.</p>\n\n<p><strong>Craig Smoll</strong><br>President, WebOuts Medical Media</p>"
     },
     {
+      "id": "both-bookings-confirmed",
+      "channel": "sms",
+      "stage": "kickoff",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Both bookings confirmed",
+      "blurb": "Confirms the provider is fully booked once interview and filming are both on the calendar.",
+      "timing": "First time both interview and filming dates are set",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, you're all set. Your script interview and filming are both booked. Check your inbox for the calendar invites."
+    },
+    {
+      "id": "cam-concierge-intro",
+      "channel": "email",
+      "stage": "kickoff",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Concierge Intro",
+      "blurb": "Arrives minutes after a provider books, introducing their personal point of contact.",
+      "timing": "Immediately after booking is confirmed",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "A quick hello from your {{org}} Physician Profile concierge",
+      "body": "<h2>You're Booked, and in Good Hands</h2>\n<p>A personal hello from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Hi, I'm <strong>Cam Kubasta</strong> with WebOuts Medical Media. Now that your {{org}} script interview and filming are on the calendar, I wanted to introduce myself. Think of me as your {{org}} Physician Profile concierge.</p>\n\n<p>My goal is simple: to make this process completely effortless for you. If a question comes up or you just want to talk something through, reach out anytime. I'm always glad to help.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR APPOINTMENTS</strong></p>\n  <ul>\n    <li><strong>SCRIPTING</strong> {{date}} at {{time}}</li>\n    <li><strong>FILMING</strong> {{date}} at {{time}}, {{filmingLocation}}</li>\n  </ul>\n  <p>Times shown in your local timezone.</p>\n</div>\n\n<p>Most of all, whatever you need along the way, consider me your direct line.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>MY CONTACT INFORMATION</strong></p>\n  <p>Call or text me anytime.</p>\n  <p>Email: <a href=\"#\">ckubasta@webouts.com</a></p>\n</div>\n\n<p>Looking forward to working with you,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media</p>"
+    },
+    {
+      "id": "crew-showcase-interview-week",
+      "channel": "email",
+      "stage": "interview",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Script Interview One Week Out",
+      "blurb": "Sets expectations for the script interview and introduces the writer a week ahead.",
+      "timing": "Seven days before the script interview",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Your {{org}} Script Interview Is One Week Away: Where Your Video Begins",
+      "body": "<h2>Your Script Interview Is One Week Away</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your script interview is <strong>one week away</strong>. This is a relaxed, 20-minute phone call designed to capture how you naturally speak with patients and create a profile script that feels authentic to you.</p>\n\n<p>No preparation, writing, or rehearsal is needed. The call is recorded so our writing team can preserve your speaking style, perspective, and personality, which we think of as your unique \"fingerprint,\" in a polished script of approximately 225 words for your review.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR SCRIPT INTERVIEW</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>HOW</strong> A relaxed phone conversation. We will call you at the mobile number you provided.</li>\n  </ul>\n</div>\n\n<p><strong>Meet your interviewer</strong></p>\n<p>Your script writer will guide you through straightforward questions about how you care for patients and what you want them to understand before choosing you.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One thing worth knowing:</strong> your script, your filming day, and your finished video all build from this one conversation. A cancellation pushes back the tool that helps new patients find you, choose you, and build your practice. Your community is waiting to meet you, and so are we.</p>\n</div>\n\n<p>Have a question? Just reply to this email.</p>\n\n<p>We can't wait to hear your story,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "interview-one-week-away",
+      "channel": "sms",
+      "stage": "interview",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Interview one week away",
+      "blurb": "A week out, sets expectations that the script interview is a relaxed phone call.",
+      "timing": "Exactly seven days before the script interview",
+      "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your script interview is one week away: {{date}} at {{time}}. It's a relaxed phone call, and it's where your profile video begins. We'll call you at this number. Questions? Just reply here."
+    },
+    {
+      "id": "crew-showcase-interview-tomorrow",
+      "channel": "email",
+      "stage": "interview",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Script Interview Tomorrow",
+      "blurb": "Brief day-before note with call details and one tip for answering naturally.",
+      "timing": "The day before the script interview",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Reminder: Your Script Interview Is Tomorrow",
+      "body": "<h2>Your Script Interview Is Tomorrow</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your script interview is <strong>tomorrow</strong>. This is a relaxed, 20-minute phone call designed to capture how you naturally speak with patients and create a profile script that feels authentic to you.</p>\n\n<p>No preparation, writing, or rehearsal is needed. Just answer naturally, and we will take it from there.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR SCRIPT INTERVIEW</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>HOW</strong> A relaxed phone conversation. We will call you at the mobile number you provided.</li>\n  </ul>\n</div>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One tip before we talk:</strong> answer as if a patient just asked you the question. Your script is built from your own words on this call, so the way you naturally explain things to your patients is exactly what we're listening for.</p>\n</div>\n\n<p><strong>Meet your interviewer</strong></p>\n<p>Your script writer will guide you through straightforward, patient-focused questions and make the call feel easy from start to finish.</p>\n\n<p>We can't wait to hear your story,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "interview-tomorrow",
+      "channel": "sms",
+      "stage": "interview",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Interview tomorrow",
+      "blurb": "Day-before reminder for the script interview, with one tip on how to answer.",
+      "timing": "The day before the script interview",
+      "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your script interview is tomorrow at {{time}}, and we'll call you. No preparation needed, and one tip: answer like a patient just asked you the question. Your own words become your script. Talk soon!"
+    },
+    {
+      "id": "interview-date-updated",
+      "channel": "sms",
+      "stage": "interview",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Interview date updated",
+      "blurb": "Tells the provider their script interview moved and a fresh invite is on the way.",
+      "timing": "When the script interview date changes after booking",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your script interview date has been updated. A new calendar invite has been sent to your inbox."
+    },
+    {
       "id": "draft-script-to-provider",
       "channel": "email",
       "stage": "script",
@@ -131,122 +216,7 @@
       "timing": "When the draft script is ready for review",
       "from": "WebOuts Medical Media <scripting@webouts.com>",
       "subject": "Profile Script - Draft from WebOuts Medical Media",
-      "body": "<h2>Physician Profile Script Draft</h2>\n<p>Please review the draft below.</p>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>IMPORTANT: Scripts need to be approved at least 1 week before filming.</strong></p>\n</div>\n\n<div class=\"wo-ml-card\">\n  <p><strong>Next step</strong></p>\n  <ul>\n    <li><strong>No edits needed:</strong> click the <strong>Script Approved</strong> button below.</li>\n    <li><strong>Need edits:</strong> reply with your changes and <strong>{{sender}}</strong> (your script writer) will send an updated version.</li>\n  </ul>\n  <p><strong>Key points</strong></p>\n  <ul>\n    <li><strong>We Make It Personal:</strong> the profile should feel personal and reflect you as a person and provider.</li>\n    <li><strong>References:</strong> please do not reference external organizations.</li>\n    <li><strong>Length:</strong> scripts must be 225 words or less (about 90 seconds).</li>\n  </ul>\n</div>\n\n<p><strong>Draft script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your draft script appears here, exactly as your writer prepared it.</p>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Script Approved</a></p>\n\n<p><strong>Important training video (6 minutes)</strong></p>\n<p>Attire tips and best practices for a smooth recording.</p>\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-minute prep video</a></p>\n\n<p>Thank you,</p>\n<p><strong>WebOuts Medical Media Team</strong></p>"
-    },
-    {
-      "id": "final-script-to-provider",
-      "channel": "email",
-      "stage": "script",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Final Approved Script",
-      "blurb": "Sends the locked, final script so the provider can practice before filming day.",
-      "timing": "Once the script is approved and locked",
-      "from": "WebOuts Medical Media <scripting@webouts.com>",
-      "subject": "Profile Script - Final from WebOuts Medical Media",
-      "body": "<h2>Physician Profile Script - Final Approved</h2>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<p>Below is your <strong>final approved</strong> physician bio video script.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>What happens next</strong></p>\n  <ul>\n    <li>Practice your script out loud so the pacing feels comfortable and conversational.</li>\n    <li>Please watch the 6-minute prep video below for attire tips and best practices for a smooth recording.</li>\n  </ul>\n</div>\n\n<p><strong>Final approved script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your final approved script appears here, ready to practice.</p>\n</div>\n\n<p><strong>Important training video (6 minutes)</strong></p>\n<p>Attire tips and best practices for a smooth recording.</p>\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-minute prep video</a></p>\n\n<p>Thank you,</p>\n<p><strong>WebOuts Medical Media Team</strong></p>"
-    },
-    {
-      "id": "script-approval-reminder",
-      "channel": "email",
-      "stage": "script",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Script Approval Reminder",
-      "blurb": "Automatic nudge when a script is still unapproved ten days out from filming.",
-      "timing": "Ten days before filming",
-      "from": "WebOuts Medical Media <scripting@webouts.com>",
-      "subject": "Action Needed: Approve & Lock Your Physician Profile Script",
-      "body": "<h2>Action Needed: Approve Your Script</h2>\n<p>Your filming is about <strong>10 days</strong> away. Scripts must be approved and locked no later than <strong>7 days before filming</strong>.</p>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<p>Your physician bio video script is ready below. It has already been reviewed and approved by the {{org}} communications team. We just need your sign-off to lock it in before filming.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR ACTION ITEM</strong></p>\n  <p><strong>No edits needed?</strong> Click the <strong>Script Approved</strong> button below. <strong>Need a change?</strong> Just reply to this email and your scriptwriter will take care of it.</p>\n</div>\n\n<p><strong>Your script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your current script appears here for a final read-through.</p>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Script Approved</a></p>\n\n<p>Thank you,</p>\n<p><strong>The WebOuts Scripting Team</strong><br>WebOuts Medical Media</p>"
-    },
-    {
-      "id": "filming-training-reminder-7day",
-      "channel": "email",
-      "stage": "filming",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Training Reminder, One Week Out",
-      "blurb": "Points the provider to the six-minute prep video a week before filming day.",
-      "timing": "Seven days before filming",
-      "from": "Cam Kubasta <ckubasta@webouts.com>",
-      "subject": "Your {{org}} Filming Is One Week Away",
-      "body": "<h2>Your Filming Is One Week Away</h2>\n<p>A quick reminder from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Just a reminder that your physician bio video filming is <strong>in one week</strong>. To help you feel confident and camera-ready, please take six minutes to watch our physician profile training video. You will meet Craig Smoll, see exactly what to expect on set, and pick up a few simple tips to ease any nerves.</p>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-Minute Training Video</a></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n  <p>Time shown in your local timezone.</p>\n</div>\n\n<p>See you on set,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
-    },
-    {
-      "id": "filming-training-reminder-1day",
-      "channel": "email",
-      "stage": "filming",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Training Reminder, Day Before",
-      "blurb": "Last-minute prep reminder with the training video, timing, and filming location.",
-      "timing": "The day before filming",
-      "from": "Cam Kubasta <ckubasta@webouts.com>",
-      "subject": "Reminder: Your {{org}} Filming Is Tomorrow",
-      "body": "<h2>Your Filming Is Tomorrow</h2>\n<p>A quick reminder from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Just a reminder that your physician bio video filming is <strong>tomorrow</strong>. To help you feel confident and camera-ready, please take six minutes to watch our physician profile training video. You will meet Craig Smoll, see exactly what to expect on set, and pick up a few simple tips to ease any nerves.</p>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-Minute Training Video</a></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n  <p>Time shown in your local timezone.</p>\n</div>\n\n<p>See you on set,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
-    },
-    {
-      "id": "crew-showcase-filming-week",
-      "channel": "email",
-      "stage": "filming",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Meet Your Film Team",
-      "blurb": "Introduces the crew assembled for the shoot one week before filming day.",
-      "timing": "Seven days before filming",
-      "from": "Cam Kubasta <ckubasta@webouts.com>",
-      "subject": "Your {{org}} Filming Is One Week Away: Meet Your Film Team",
-      "body": "<h2>Your Filming Is One Week Away</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your filming is <strong>one week away</strong>. Patients who engage with a provider profile video are more than 60% more likely to call or click to schedule an appointment. That means your video is not just an introduction. It is a practice-building tool that helps patients feel more confident choosing you and taking the next step.</p>\n\n<p>A dedicated production team has already been contracted and coordinated around your 1-hour filming session, including coaching, camera, lighting, hair and makeup, and production support. Because this production time is built specifically around your appointment, we appreciate you making every effort to keep this time set aside.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n</div>\n\n<p><strong>Your {{org}} contact</strong></p>\n<p><strong>{{contact}}</strong> is your marketing contact for filming day and will be there to help make sure everything runs smoothly.</p>\n\n<p><strong>Meet the team we've assembled for your shoot</strong></p>\n<p>Each member was hand-picked for your profile. Here's who's taking care of you, on set and behind the scenes:</p>\n<ul>\n  <li><strong>Craig Smoll</strong>, Co-Owner / Filming Coach. Craig brings 20+ years of healthcare-specific filming experience and will coach you through the process so you feel natural, confident, and comfortable on camera.</li>\n  <li><strong>Hair &amp; Makeup</strong>. Your stylist brings years of professional hair and makeup experience for camera and will help you look natural, polished, and camera-ready.</li>\n  <li><strong>Cam Kubasta</strong>, Production Coordinator. Cam handles the pre-production details, scheduling, and white-glove coordination leading up to filming so your experience is organized, simple, and smooth from start to finish.</li>\n  <li><strong>Director of Photography</strong>. Your DP brings 25+ years of production experience and oversees the technical side of filming, including camera, lighting, audio, and the WebOuts remote filming systems.</li>\n</ul>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One thing worth knowing:</strong> your film team isn't part of the {{org}} staff. Each member is dedicated to your profile video, whether they're on set with you or supporting your production behind the scenes. A cancellation doesn't just carry a real cost for {{org}}. It delays the tool that helps new patients find you, choose you, and build your practice. Your community is waiting to meet you, and so are we.</p>\n</div>\n\n<p>No preparation needed. Your film coach will guide you through everything on the day. Have a question? Just reply to this email.</p>\n\n<p>We can't wait to see you on camera,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
-    },
-    {
-      "id": "crew-showcase-filming-tomorrow",
-      "channel": "email",
-      "stage": "filming",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Your Team Is Ready",
-      "blurb": "Short day-before note with logistics and a photo strip of the crew who will be there.",
-      "timing": "The day before filming",
-      "from": "Cam Kubasta <ckubasta@webouts.com>",
-      "subject": "Reminder: Your Filming Is Tomorrow and Your Team Is Ready",
-      "body": "<h2>Your Filming Is Tomorrow</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your filming is <strong>tomorrow</strong>. A professional production team has already been contracted and coordinated around your 1-hour session, so we appreciate you keeping this time protected.</p>\n\n<p>During your appointment, we'll coach you through creating a provider profile video that makes a real difference for patients deciding who to trust with their care. Patients who engage with a provider profile video are more than 60% more likely to call or click to schedule an appointment, making this a powerful practice-building tool.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n</div>\n\n<p><strong>Your team is ready</strong></p>\n<ul>\n  <li><strong>{{contact}}</strong>, {{org}}</li>\n  <li><strong>Craig Smoll</strong>, Co-Owner / Filming Coach</li>\n  <li><strong>Hair &amp; Makeup</strong></li>\n  <li><strong>Cam Kubasta</strong>, Production Coordinator</li>\n  <li><strong>Director of Photography</strong></li>\n</ul>\n\n<p>We can't wait to see you on camera,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
-    },
-    {
-      "id": "crew-showcase-interview-week",
-      "channel": "email",
-      "stage": "filming",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Script Interview One Week Out",
-      "blurb": "Sets expectations for the script interview and introduces the writer a week ahead.",
-      "timing": "Seven days before the script interview",
-      "from": "Cam Kubasta <ckubasta@webouts.com>",
-      "subject": "Your {{org}} Script Interview Is One Week Away: Where Your Video Begins",
-      "body": "<h2>Your Script Interview Is One Week Away</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your script interview is <strong>one week away</strong>. This is a relaxed, 20-minute phone call designed to capture how you naturally speak with patients and create a profile script that feels authentic to you.</p>\n\n<p>No preparation, writing, or rehearsal is needed. The call is recorded so our writing team can preserve your speaking style, perspective, and personality, which we think of as your unique \"fingerprint,\" in a polished script of approximately 225 words for your review.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR SCRIPT INTERVIEW</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>HOW</strong> A relaxed phone conversation. We will call you at the mobile number you provided.</li>\n  </ul>\n</div>\n\n<p><strong>Meet your interviewer</strong></p>\n<p><strong>{{sender}}</strong>, Script Writer. Your scriptwriter will guide you through straightforward questions about how you care for patients and what you want them to understand before choosing you.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One thing worth knowing:</strong> your script, your filming day, and your finished video all build from this one conversation. A cancellation pushes back the tool that helps new patients find you, choose you, and build your practice. Your community is waiting to meet you, and so are we.</p>\n</div>\n\n<p>Have a question? Just reply to this email.</p>\n\n<p>We can't wait to hear your story,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
-    },
-    {
-      "id": "crew-showcase-interview-tomorrow",
-      "channel": "email",
-      "stage": "filming",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Script Interview Tomorrow",
-      "blurb": "Brief day-before note with call details and one tip for answering naturally.",
-      "timing": "The day before the script interview",
-      "from": "Cam Kubasta <ckubasta@webouts.com>",
-      "subject": "Reminder: Your Script Interview Is Tomorrow",
-      "body": "<h2>Your Script Interview Is Tomorrow</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your script interview is <strong>tomorrow</strong>. This is a relaxed, 20-minute phone call designed to capture how you naturally speak with patients and create a profile script that feels authentic to you.</p>\n\n<p>No preparation, writing, or rehearsal is needed. Just answer naturally, and we will take it from there.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR SCRIPT INTERVIEW</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>HOW</strong> A relaxed phone conversation. We will call you at the mobile number you provided.</li>\n  </ul>\n</div>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One tip before we talk:</strong> answer as if a patient just asked you the question. Your script is built from your own words on this call, so the way you naturally explain things to your patients is exactly what we're listening for.</p>\n</div>\n\n<p><strong>Meet your interviewer</strong></p>\n<p><strong>{{sender}}</strong>, Script Writer. Your writer will guide you through straightforward, patient-focused questions and make the call feel easy from start to finish.</p>\n\n<p>We can't wait to hear your story,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
-    },
-    {
-      "id": "training-video-nudge",
-      "channel": "sms",
-      "stage": "ongoing",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Training video nudge",
-      "blurb": "Sent ahead of filming so the provider knows the team and walks in prepared.",
-      "timing": "When training reminder is turned on for a provider",
-      "body": "WebOuts: Meet the team and prep for a confident shoot. Watch our 6-min training: {{link}}"
+      "body": "<h2>Physician Profile Script Draft</h2>\n<p>Please review the draft below.</p>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>IMPORTANT: Scripts need to be approved at least 1 week before filming.</strong></p>\n</div>\n\n<div class=\"wo-ml-card\">\n  <p><strong>Next step</strong></p>\n  <ul>\n    <li><strong>No edits needed:</strong> click the <strong>Script Approved</strong> button below.</li>\n    <li><strong>Need edits:</strong> reply with your changes and <strong>your script writer</strong> will send an updated version.</li>\n  </ul>\n  <p><strong>Key points</strong></p>\n  <ul>\n    <li><strong>Make it personal:</strong> the profile should feel personal and reflect you as a person and provider.</li>\n    <li><strong>References:</strong> please do not reference external organizations.</li>\n    <li><strong>Length:</strong> scripts must be 225 words or less (about 90 seconds).</li>\n  </ul>\n</div>\n\n<p><strong>Draft script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your draft script appears here, exactly as your writer prepared it.</p>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Script Approved</a></p>\n\n<p><strong>Important training video (6 minutes)</strong></p>\n<p>Attire tips and best practices for a smooth recording.</p>\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-minute prep video</a></p>\n\n<p>Thank you,</p>\n<p><strong>WebOuts Medical Media Team</strong></p>"
     },
     {
       "id": "draft-script-sent",
@@ -260,15 +230,17 @@
       "body": "WebOuts: Hi Dr. {{providerLastName}}, your profile script draft is in your inbox and ready for review."
     },
     {
-      "id": "final-script-sent",
-      "channel": "sms",
+      "id": "script-approval-reminder",
+      "channel": "email",
       "stage": "script",
       "sentBy": "WebOuts",
       "audience": "Provider",
-      "title": "Final script sent",
-      "blurb": "Lets the provider know the final script is ready and nudges them to rehearse it.",
-      "timing": "When the final script email is sent",
-      "body": "WebOuts: Hi Dr. {{providerLastName}}, your final script has been sent to your inbox. Practicing it aloud a few times before filming will help you feel confident on camera."
+      "title": "Script Approval Reminder",
+      "blurb": "Automatic nudge when a script is still unapproved ten days out from filming.",
+      "timing": "Ten days before filming",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "Action Needed: Approve & Lock Your Physician Profile Script",
+      "body": "<h2>Action Needed: Approve Your Script</h2>\n<p>Your filming is about <strong>10 days</strong> away. Scripts must be approved and locked no later than <strong>7 days before filming</strong>.</p>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<p>Your physician bio video script is ready below. It has already been reviewed and approved by the {{org}} communications team. We just need your sign-off to lock it in before filming.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR ACTION ITEM</strong></p>\n  <p><strong>No edits needed?</strong> Click the <strong>Script Approved</strong> button below. <strong>Need a change?</strong> Just reply to this email and your scriptwriter will take care of it.</p>\n</div>\n\n<p><strong>Your script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your current script appears here for a final read-through.</p>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Script Approved</a></p>\n\n<p>Thank you,</p>\n<p><strong>The WebOuts Scripting Team</strong><br>WebOuts Medical Media</p>"
     },
     {
       "id": "approval-reminder-1-week",
@@ -304,37 +276,65 @@
       "body": "WebOuts: Hi Dr. {{providerLastName}}, a friendly nudge: your script draft from last week is still waiting for your approval whenever you have a moment. It's in your inbox, or reply here with any questions."
     },
     {
-      "id": "both-bookings-confirmed",
-      "channel": "sms",
-      "stage": "filming",
+      "id": "final-script-to-provider",
+      "channel": "email",
+      "stage": "script",
       "sentBy": "WebOuts",
       "audience": "Provider",
-      "title": "Both bookings confirmed",
-      "blurb": "Confirms the provider is fully booked once interview and filming are both on the calendar.",
-      "timing": "First time both interview and filming dates are set",
-      "body": "WebOuts: Hi Dr. {{providerLastName}}, you're all set. Your script interview and filming are both booked. Check your inbox for the calendar invites."
+      "title": "Final Approved Script",
+      "blurb": "Sends the locked, final script so the provider can practice before filming day.",
+      "timing": "Once the script is approved and locked",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "Profile Script - Final from WebOuts Medical Media",
+      "body": "<h2>Physician Profile Script - Final Approved</h2>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<p>Below is your <strong>final approved</strong> physician bio video script.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>What happens next</strong></p>\n  <ul>\n    <li>Practice your script out loud so the pacing feels comfortable and conversational.</li>\n    <li>Please watch the 6-minute prep video below for attire tips and best practices for a smooth recording.</li>\n  </ul>\n</div>\n\n<p><strong>Final approved script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your final approved script appears here, ready to practice.</p>\n</div>\n\n<p><strong>Important training video (6 minutes)</strong></p>\n<p>Attire tips and best practices for a smooth recording.</p>\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-minute prep video</a></p>\n\n<p>Thank you,</p>\n<p><strong>WebOuts Medical Media Team</strong></p>"
     },
     {
-      "id": "filming-date-updated",
+      "id": "final-script-sent",
       "channel": "sms",
-      "stage": "filming",
+      "stage": "script",
       "sentBy": "WebOuts",
       "audience": "Provider",
-      "title": "Filming date updated",
-      "blurb": "Tells the provider their filming date moved and a fresh invite is on the way.",
-      "timing": "When the filming date changes after booking",
-      "body": "WebOuts: Hi Dr. {{providerLastName}}, your filming date has been updated. A new calendar invite has been sent to your inbox."
+      "title": "Final script sent",
+      "blurb": "Lets the provider know the final script is ready and nudges them to rehearse it.",
+      "timing": "When the final script email is sent",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your final script has been sent to your inbox. Practicing it aloud a few times before filming will help you feel confident on camera."
     },
     {
-      "id": "interview-date-updated",
+      "id": "training-video-nudge",
       "channel": "sms",
       "stage": "filming",
       "sentBy": "WebOuts",
       "audience": "Provider",
-      "title": "Interview date updated",
-      "blurb": "Tells the provider their script interview moved and a fresh invite is on the way.",
-      "timing": "When the script interview date changes after booking",
-      "body": "WebOuts: Hi Dr. {{providerLastName}}, your script interview date has been updated. A new calendar invite has been sent to your inbox."
+      "title": "Training video nudge",
+      "blurb": "Sent ahead of filming so the provider knows the team and walks in prepared.",
+      "timing": "When training reminder is turned on for a provider",
+      "body": "WebOuts: Meet the team and prep for a confident shoot. Watch our 6-min training: {{link}}"
+    },
+    {
+      "id": "filming-training-reminder-7day",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Training Reminder, One Week Out",
+      "blurb": "Points the provider to the six-minute prep video a week before filming day.",
+      "timing": "Seven days before filming",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Your {{org}} Filming Is One Week Away",
+      "body": "<h2>Your Filming Is One Week Away</h2>\n<p>A quick reminder from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Just a reminder that your physician bio video filming is <strong>in one week</strong>. To help you feel confident and camera-ready, please take six minutes to watch our physician profile training video. You will meet Craig Smoll, see exactly what to expect on set, and pick up a few simple tips to ease any nerves.</p>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-Minute Training Video</a></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n  <p>Time shown in your local timezone.</p>\n</div>\n\n<p>See you on set,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "crew-showcase-filming-week",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Meet Your Film Team",
+      "blurb": "Introduces the crew assembled for the shoot one week before filming day.",
+      "timing": "Seven days before filming",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Your {{org}} Filming Is One Week Away: Meet Your Film Team",
+      "body": "<h2>Your Filming Is One Week Away</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your filming is <strong>one week away</strong>. Patients who engage with a provider profile video are more than 60% more likely to call or click to schedule an appointment. That means your video is not just an introduction. It is a practice-building tool that helps patients feel more confident choosing you and taking the next step.</p>\n\n<p>A dedicated production team has already been contracted and coordinated around your 1-hour filming session, including coaching, camera, lighting, hair and makeup, and production support. Because this production time is built specifically around your appointment, we appreciate you making every effort to keep this time set aside.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n</div>\n\n<p><strong>Your {{org}} contact</strong></p>\n<p><strong>{{contact}}</strong> is your marketing contact for filming day and will be there to help make sure everything runs smoothly.</p>\n\n<p><strong>Meet the team we've assembled for your shoot</strong></p>\n<p>Each member was hand-picked for your profile. Here's who's taking care of you, on set and behind the scenes:</p>\n<ul>\n  <li><strong>Craig Smoll</strong>, Co-Owner / Filming Coach. Craig brings 20+ years of healthcare-specific filming experience and will coach you through the process so you feel natural, confident, and comfortable on camera.</li>\n  <li><strong>Hair &amp; Makeup</strong>. Your stylist brings years of professional hair and makeup experience for camera and will help you look natural, polished, and camera-ready.</li>\n  <li><strong>Cam Kubasta</strong>, Production Coordinator. Cam handles the pre-production details, scheduling, and white-glove coordination leading up to filming so your experience is organized, simple, and smooth from start to finish.</li>\n  <li><strong>Director of Photography</strong>. Your DP brings 25+ years of production experience and oversees the technical side of filming, including camera, lighting, audio, and the WebOuts remote filming systems.</li>\n</ul>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One thing worth knowing:</strong> your film team isn't part of the {{org}} staff. Each member is dedicated to your profile video, whether they're on set with you or supporting your production behind the scenes. A cancellation doesn't just carry a real cost for {{org}}. It delays the tool that helps new patients find you, choose you, and build your practice. Your community is waiting to meet you, and so are we.</p>\n</div>\n\n<p>No preparation needed. Your film coach will guide you through everything on the day. Have a question? Just reply to this email.</p>\n\n<p>We can't wait to see you on camera,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
     },
     {
       "id": "filming-one-week-away",
@@ -348,6 +348,32 @@
       "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your profile video filming is one week away: {{date}} at {{time}}, {{filmingLocation}}. We've hand-picked a film team dedicated to your video, and your community is waiting to meet you. Full details are in your email. Questions? Just reply here."
     },
     {
+      "id": "filming-training-reminder-1day",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Training Reminder, Day Before",
+      "blurb": "Last-minute prep reminder with the training video, timing, and filming location.",
+      "timing": "The day before filming",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Reminder: Your {{org}} Filming Is Tomorrow",
+      "body": "<h2>Your Filming Is Tomorrow</h2>\n<p>A quick reminder from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Just a reminder that your physician bio video filming is <strong>tomorrow</strong>. To help you feel confident and camera-ready, please take six minutes to watch our physician profile training video. You will meet Craig Smoll, see exactly what to expect on set, and pick up a few simple tips to ease any nerves.</p>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-Minute Training Video</a></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n  <p>Time shown in your local timezone.</p>\n</div>\n\n<p>See you on set,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "crew-showcase-filming-tomorrow",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Your Team Is Ready",
+      "blurb": "Short day-before note with logistics and a photo strip of the crew who will be there.",
+      "timing": "The day before filming",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Reminder: Your Filming Is Tomorrow and Your Team Is Ready",
+      "body": "<h2>Your Filming Is Tomorrow</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your filming is <strong>tomorrow</strong>. A professional production team has already been contracted and coordinated around your 1-hour session, so we appreciate you keeping this time protected.</p>\n\n<p>During your appointment, we'll coach you through creating a provider profile video that makes a real difference for patients deciding who to trust with their care. Patients who engage with a provider profile video are more than 60% more likely to call or click to schedule an appointment, making this a powerful practice-building tool.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n</div>\n\n<p><strong>Your team is ready</strong></p>\n<ul>\n  <li><strong>{{contact}}</strong>, {{org}}</li>\n  <li><strong>Craig Smoll</strong>, Co-Owner / Filming Coach</li>\n  <li><strong>Hair &amp; Makeup</strong></li>\n  <li><strong>Cam Kubasta</strong>, Production Coordinator</li>\n  <li><strong>Director of Photography</strong></li>\n</ul>\n\n<p>We can't wait to see you on camera,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
       "id": "filming-tomorrow",
       "channel": "sms",
       "stage": "filming",
@@ -359,26 +385,15 @@
       "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your filming is tomorrow at {{time}}, {{filmingLocation}}. Your team is ready and it can't happen without you. Come as you are: hair, makeup, and coaching are all taken care of. See you tomorrow!"
     },
     {
-      "id": "interview-one-week-away",
+      "id": "filming-date-updated",
       "channel": "sms",
       "stage": "filming",
       "sentBy": "WebOuts",
       "audience": "Provider",
-      "title": "Interview one week away",
-      "blurb": "A week out, sets expectations that the script interview is a relaxed phone call.",
-      "timing": "Exactly seven days before the script interview",
-      "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your script interview is one week away: {{date}} at {{time}}. It's a relaxed phone call, and it's where your profile video begins. We'll call you at this number. Questions? Just reply here."
-    },
-    {
-      "id": "interview-tomorrow",
-      "channel": "sms",
-      "stage": "filming",
-      "sentBy": "WebOuts",
-      "audience": "Provider",
-      "title": "Interview tomorrow",
-      "blurb": "Day-before reminder for the script interview, with one tip on how to answer.",
-      "timing": "The day before the script interview",
-      "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your script interview is tomorrow at {{time}}, and we'll call you. No preparation needed, and one tip: answer like a patient just asked you the question. Your own words become your script. Talk soon!"
+      "title": "Filming date updated",
+      "blurb": "Tells the provider their filming date moved and a fresh invite is on the way.",
+      "timing": "When the filming date changes after booking",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your filming date has been updated. A new calendar invite has been sent to your inbox."
     },
     {
       "id": "leadership-filming-reminder",
@@ -964,7 +979,9 @@
     filmingLocation: { ph: 'Filming Location', get: function () { return fval('filming.location'); } },
     date: { ph: 'Filming Date', get: function () { return ''; } },
     time: { ph: 'Time', get: function () { return ''; } },
-    link: { ph: 'link', get: function () { return ''; } }
+    link: { ph: 'link', get: function () { return ''; } },
+    bookingLink: { ph: 'your booking page', get: function () { return ''; } },
+    sampleVideo: { ph: 'example video link', get: function () { return ''; } }
   };
   var overrides = {};
   function tokenVal(k) {
@@ -992,11 +1009,12 @@
   }
 
   var GROUPS = [
-    { stage: 'kickoff', label: 'Kickoff and scheduling', when: 'From project launch until each provider books' },
+    { stage: 'announce', label: 'Your kickoff announcement', when: 'You send this to launch the project' },
+    { stage: 'kickoff', label: 'Booking and scheduling', when: 'From your announcement until each provider books' },
+    { stage: 'interview', label: 'Script interview', when: 'Before the 20 minute phone interview' },
     { stage: 'script', label: 'Script review and approval', when: 'From the first draft until the script is approved' },
     { stage: 'filming', label: 'Filming preparation', when: 'The two weeks before filming day' },
-    { stage: 'ongoing', label: 'Ongoing', when: 'Anytime during the project' },
-    { stage: 'client-sent', label: 'You send this one', when: 'Less than a week before filming' }
+    { stage: 'client-sent', label: 'Your filming reminder', when: 'You send this less than a week before filming' }
   ];
   function countLabel(items) {
     var e = items.filter(function (s) { return s.channel === 'email'; }).length;
