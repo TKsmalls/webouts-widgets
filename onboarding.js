@@ -37,6 +37,366 @@
     ] }
   };
 
+  // ---- communication samples shown in section 6 ----
+  // Sanitized copies of the real templates. {{tokens}} fill from the form above.
+  // Sources: n8n workflows (emails + SMS). The hammer email has no workflow: the
+  // client sends it themselves, which is why it carries sentBy + copyable.
+  var SAMPLES = [
+    {
+      "id": "cam-concierge-intro",
+      "channel": "email",
+      "stage": "kickoff",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Concierge Intro",
+      "blurb": "Arrives minutes after a provider books, introducing their personal point of contact.",
+      "timing": "Immediately after booking is confirmed",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "A quick hello from your {{org}} Physician Profile concierge",
+      "body": "<h2>You're Booked, and in Good Hands</h2>\n<p>A personal hello from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Hi, I'm <strong>Cam Kubasta</strong> with WebOuts Medical Media. Now that your {{org}} script interview and filming are on the calendar, I wanted to introduce myself. Think of me as your {{org}} Physician Profile concierge.</p>\n\n<p>My goal is simple: to make this process completely effortless for you. If a question comes up or you just want to talk something through, reach out anytime. I'm always glad to help.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR APPOINTMENTS</strong></p>\n  <ul>\n    <li><strong>SCRIPTING</strong> {{date}} at {{time}}</li>\n    <li><strong>FILMING</strong> {{date}} at {{time}}, {{filmingLocation}}</li>\n  </ul>\n  <p>Times shown in your local timezone.</p>\n</div>\n\n<p>Most of all, whatever you need along the way, consider me your direct line.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>MY CONTACT INFORMATION</strong></p>\n  <p>Call or text me anytime.</p>\n  <p>Email: <a href=\"#\">ckubasta@webouts.com</a></p>\n</div>\n\n<p>Looking forward to working with you,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media</p>"
+    },
+    {
+      "id": "fomo-1",
+      "channel": "email",
+      "stage": "kickoff",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Scheduling Invite (Stage 1)",
+      "blurb": "The opening scheduling invitation, sent once the health system has announced the project.",
+      "timing": "First scheduling touch after client intro",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "(Reminder) Schedule Your {{org}} Physician Profile: Script Interview & Filming",
+      "body": "<h2>{{org}} Physician Profiles</h2>\n<p>Now booking filming through {{date}}</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>I'm Craig Smoll, President of WebOuts Medical Media. We're honored to work with {{org}}, and over the past 10 years we've helped produce physician profile videos that support patient connection and practice growth.</p>\n\n<p>Please use the link below to schedule your <strong>20-minute script interview</strong> and <strong>1-hour filming</strong> appointment. Just select \"English only\" or \"English &amp; Spanish.\" We're currently booking filming dates through <strong>{{date}}</strong>, so you can reserve a time that fits your schedule weeks ahead.</p>\n\n<p>Filming takes place at {{filmingLocation}}, and you'll be coached throughout. Our team will follow up with reminders and next steps.</p>\n\n<p>If someone on your team handles scheduling, feel free to forward this email so they can book on your behalf.</p>\n\n<div class=\"wo-ml-card\">\n  <ul>\n    <li><strong>WHAT</strong> A <strong>20-minute phone call script interview</strong> plus a <strong>1-hour filming session</strong></li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n    <li><strong>WHEN</strong> {{date}}</li>\n    <li><strong>NOTE</strong> Choose a filming date at least <strong>two weeks</strong> after your script interview, so there is time for script prep and review.</li>\n  </ul>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Schedule Interview &amp; Filming</a></p>\n<p>Pick \"English only\" or \"English &amp; Spanish.\" Calendar invites arrive right away.</p>\n\n<p>Questions? Just reply to this email.</p>\n\n<p><strong>Craig Smoll</strong><br>President, WebOuts Medical Media</p>"
+    },
+    {
+      "id": "fomo-2",
+      "channel": "email",
+      "stage": "kickoff",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Slots Remaining (Stage 2)",
+      "blurb": "First nudge for providers who have not booked, leading with remaining filming slots.",
+      "timing": "Next scheduling run after the invite",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "Quick Update: Only a Few Filming Slots Remain for {{date}}",
+      "body": "<h2>Filming Slots Remaining</h2>\n<p>Filming {{date}}</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Only a limited number of filming slots remain for {{org}} physician profile filming on <strong>{{date}}</strong>.</p>\n\n<p>Knowing how quickly physicians' schedules fill, we invite you to use the link below to secure one of the remaining slots that's convenient for you.</p>\n\n<p>If someone on your team handles scheduling, feel free to forward this email so they can book on your behalf.</p>\n\n<div class=\"wo-ml-card\">\n  <ul>\n    <li><strong>WHAT</strong> A <strong>20-minute phone call script interview</strong> plus a <strong>1-hour filming session</strong></li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n    <li><strong>WHEN</strong> {{date}}</li>\n    <li><strong>NOTE</strong> Choose a filming date at least <strong>two weeks</strong> after your script interview, so there is time for script prep and review.</li>\n  </ul>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Schedule Interview &amp; Filming</a></p>\n\n<p>Questions? Just reply to this email.</p>\n\n<p><strong>Craig Smoll</strong><br>President, WebOuts Medical Media</p>"
+    },
+    {
+      "id": "fomo-3",
+      "channel": "email",
+      "stage": "kickoff",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Dates Filling Up (Stage 3)",
+      "blurb": "Shows which filming dates peers have already filled and which are still open.",
+      "timing": "Third scheduling touch, roughly a week later",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "(Quick Update) {{org}} Profile Filming: Some Dates Filled, Some Still Open",
+      "body": "<h2>Filming Slots Remaining</h2>\n<p>Filming {{date}}</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Due to a strong scheduling response from your fellow {{org}} doctors, several filming dates are now filled. The good news: we still have filming slots remaining for <strong>{{date}}</strong>.</p>\n\n<p>We invite you to take three minutes to choose one of the remaining slots before they're filled.</p>\n\n<p>If someone on your team handles scheduling, feel free to forward this email so they can book on your behalf.</p>\n\n<div class=\"wo-ml-card\">\n  <ul>\n    <li><strong>WHAT</strong> A <strong>20-minute phone call script interview</strong> plus a <strong>1-hour filming session</strong></li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n    <li><strong>WHEN</strong> {{date}}</li>\n    <li><strong>NOTE</strong> Choose a filming date at least <strong>two weeks</strong> after your script interview, so there is time for script prep and review.</li>\n  </ul>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Schedule Interview &amp; Filming</a></p>\n\n<p>Questions? Just reply to this email.</p>\n\n<p><strong>Craig Smoll</strong><br>President, WebOuts Medical Media</p>"
+    },
+    {
+      "id": "fomo-4",
+      "channel": "email",
+      "stage": "kickoff",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Time Sensitive (Stage 4)",
+      "blurb": "Time sensitive nudge once the schedule is down to its last handful of filming slots.",
+      "timing": "Fourth scheduling touch, slots nearly gone",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "(Time Sensitive) Down to the Final {{org}} Filming Slots",
+      "body": "<h2>Filming Slots Remaining</h2>\n<p>Filming {{date}}</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>We're down to the final filming slots for {{org}} physician profile filming. Spots are going fast. Booking takes under a minute, and your calendar invitations arrive right away.</p>\n\n<p>If someone on your team handles scheduling, feel free to forward this email so they can book on your behalf.</p>\n\n<div class=\"wo-ml-card\">\n  <ul>\n    <li><strong>WHAT</strong> A <strong>20-minute phone call script interview</strong> plus a <strong>1-hour filming session</strong></li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n    <li><strong>WHEN</strong> {{date}}</li>\n    <li><strong>NOTE</strong> Choose a filming date at least <strong>two weeks</strong> after your script interview, so there is time for script prep and review.</li>\n  </ul>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Schedule Interview &amp; Filming</a></p>\n\n<p>Questions? Just reply to this email.</p>\n\n<p><strong>Craig Smoll</strong><br>President, WebOuts Medical Media</p>"
+    },
+    {
+      "id": "fomo-5",
+      "channel": "email",
+      "stage": "kickoff",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Final Reminder (Stage 5)",
+      "blurb": "Last scheduling email before the provider is handed back to health system leadership.",
+      "timing": "Final touch before escalation to leadership",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "Final reminder: schedule your {{org}} profile video",
+      "body": "<h2>Filming Slots Remaining</h2>\n<p>Filming {{date}}</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>This is our final reminder about your {{org}} physician profile video. If we don't hear from you, we'll hand scheduling back to {{org}} leadership, who will follow up with you and your admin directly. <strong>Slots are still open</strong> if you'd like to grab one.</p>\n\n<p>If someone on your team handles scheduling, feel free to forward this email so they can book on your behalf.</p>\n\n<div class=\"wo-ml-card\">\n  <ul>\n    <li><strong>WHAT</strong> A <strong>20-minute phone call script interview</strong> plus a <strong>1-hour filming session</strong></li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n    <li><strong>WHEN</strong> {{date}}</li>\n    <li><strong>NOTE</strong> Choose a filming date at least <strong>two weeks</strong> after your script interview, so there is time for script prep and review.</li>\n  </ul>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Schedule Interview &amp; Filming</a></p>\n\n<p>Questions? Just reply to this email.</p>\n\n<p><strong>Craig Smoll</strong><br>President, WebOuts Medical Media</p>"
+    },
+    {
+      "id": "draft-script-to-provider",
+      "channel": "email",
+      "stage": "script",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Draft Script for Review",
+      "blurb": "Delivers the first draft of the provider script and asks for approval or edits.",
+      "timing": "When the draft script is ready for review",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "Profile Script - Draft from WebOuts Medical Media",
+      "body": "<h2>Physician Profile Script Draft</h2>\n<p>Please review the draft below.</p>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>IMPORTANT: Scripts need to be approved at least 1 week before filming.</strong></p>\n</div>\n\n<div class=\"wo-ml-card\">\n  <p><strong>Next step</strong></p>\n  <ul>\n    <li><strong>No edits needed:</strong> click the <strong>Script Approved</strong> button below.</li>\n    <li><strong>Need edits:</strong> reply with your changes and <strong>{{sender}}</strong> (your script writer) will send an updated version.</li>\n  </ul>\n  <p><strong>Key points</strong></p>\n  <ul>\n    <li><strong>We Make It Personal:</strong> the profile should feel personal and reflect you as a person and provider.</li>\n    <li><strong>References:</strong> please do not reference external organizations.</li>\n    <li><strong>Length:</strong> scripts must be 225 words or less (about 90 seconds).</li>\n  </ul>\n</div>\n\n<p><strong>Draft script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your draft script appears here, exactly as your writer prepared it.</p>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Script Approved</a></p>\n\n<p><strong>Important training video (6 minutes)</strong></p>\n<p>Attire tips and best practices for a smooth recording.</p>\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-minute prep video</a></p>\n\n<p>Thank you,</p>\n<p><strong>WebOuts Medical Media Team</strong></p>"
+    },
+    {
+      "id": "final-script-to-provider",
+      "channel": "email",
+      "stage": "script",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Final Approved Script",
+      "blurb": "Sends the locked, final script so the provider can practice before filming day.",
+      "timing": "Once the script is approved and locked",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "Profile Script - Final from WebOuts Medical Media",
+      "body": "<h2>Physician Profile Script - Final Approved</h2>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<p>Below is your <strong>final approved</strong> physician bio video script.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>What happens next</strong></p>\n  <ul>\n    <li>Practice your script out loud so the pacing feels comfortable and conversational.</li>\n    <li>Please watch the 6-minute prep video below for attire tips and best practices for a smooth recording.</li>\n  </ul>\n</div>\n\n<p><strong>Final approved script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your final approved script appears here, ready to practice.</p>\n</div>\n\n<p><strong>Important training video (6 minutes)</strong></p>\n<p>Attire tips and best practices for a smooth recording.</p>\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-minute prep video</a></p>\n\n<p>Thank you,</p>\n<p><strong>WebOuts Medical Media Team</strong></p>"
+    },
+    {
+      "id": "script-approval-reminder",
+      "channel": "email",
+      "stage": "script",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Script Approval Reminder",
+      "blurb": "Automatic nudge when a script is still unapproved ten days out from filming.",
+      "timing": "Ten days before filming",
+      "from": "WebOuts Medical Media <scripting@webouts.com>",
+      "subject": "Action Needed: Approve & Lock Your Physician Profile Script",
+      "body": "<h2>Action Needed: Approve Your Script</h2>\n<p>Your filming is about <strong>10 days</strong> away. Scripts must be approved and locked no later than <strong>7 days before filming</strong>.</p>\n\n<p><strong>Hello {{provider}},</strong></p>\n\n<p>Your physician bio video script is ready below. It has already been reviewed and approved by the {{org}} communications team. We just need your sign-off to lock it in before filming.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR ACTION ITEM</strong></p>\n  <p><strong>No edits needed?</strong> Click the <strong>Script Approved</strong> button below. <strong>Need a change?</strong> Just reply to this email and your scriptwriter will take care of it.</p>\n</div>\n\n<p><strong>Your script</strong></p>\n\n<div class=\"wo-ml-card\">\n  <p>Your current script appears here for a final read-through.</p>\n</div>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Script Approved</a></p>\n\n<p>Thank you,</p>\n<p><strong>The WebOuts Scripting Team</strong><br>WebOuts Medical Media</p>"
+    },
+    {
+      "id": "filming-training-reminder-7day",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Training Reminder, One Week Out",
+      "blurb": "Points the provider to the six-minute prep video a week before filming day.",
+      "timing": "Seven days before filming",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Your {{org}} Filming Is One Week Away",
+      "body": "<h2>Your Filming Is One Week Away</h2>\n<p>A quick reminder from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Just a reminder that your physician bio video filming is <strong>in one week</strong>. To help you feel confident and camera-ready, please take six minutes to watch our physician profile training video. You will meet Craig Smoll, see exactly what to expect on set, and pick up a few simple tips to ease any nerves.</p>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-Minute Training Video</a></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n  <p>Time shown in your local timezone.</p>\n</div>\n\n<p>See you on set,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "filming-training-reminder-1day",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Training Reminder, Day Before",
+      "blurb": "Last-minute prep reminder with the training video, timing, and filming location.",
+      "timing": "The day before filming",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Reminder: Your {{org}} Filming Is Tomorrow",
+      "body": "<h2>Your Filming Is Tomorrow</h2>\n<p>A quick reminder from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Just a reminder that your physician bio video filming is <strong>tomorrow</strong>. To help you feel confident and camera-ready, please take six minutes to watch our physician profile training video. You will meet Craig Smoll, see exactly what to expect on set, and pick up a few simple tips to ease any nerves.</p>\n\n<p><a class=\"wo-ml-btn\" href=\"#\">Watch the 6-Minute Training Video</a></p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n  <p>Time shown in your local timezone.</p>\n</div>\n\n<p>See you on set,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "crew-showcase-filming-week",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Meet Your Film Team",
+      "blurb": "Introduces the crew assembled for the shoot one week before filming day.",
+      "timing": "Seven days before filming",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Your {{org}} Filming Is One Week Away: Meet Your Film Team",
+      "body": "<h2>Your Filming Is One Week Away</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your filming is <strong>one week away</strong>. Patients who engage with a provider profile video are more than 60% more likely to call or click to schedule an appointment. That means your video is not just an introduction. It is a practice-building tool that helps patients feel more confident choosing you and taking the next step.</p>\n\n<p>A dedicated production team has already been contracted and coordinated around your 1-hour filming session, including coaching, camera, lighting, hair and makeup, and production support. Because this production time is built specifically around your appointment, we appreciate you making every effort to keep this time set aside.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n</div>\n\n<p><strong>Your {{org}} contact</strong></p>\n<p><strong>{{contact}}</strong> is your marketing contact for filming day and will be there to help make sure everything runs smoothly.</p>\n\n<p><strong>Meet the team we've assembled for your shoot</strong></p>\n<p>Each member was hand-picked for your profile. Here's who's taking care of you, on set and behind the scenes:</p>\n<ul>\n  <li><strong>Craig Smoll</strong>, Co-Owner / Filming Coach. Craig brings 20+ years of healthcare-specific filming experience and will coach you through the process so you feel natural, confident, and comfortable on camera.</li>\n  <li><strong>Hair &amp; Makeup</strong>. Your stylist brings years of professional hair and makeup experience for camera and will help you look natural, polished, and camera-ready.</li>\n  <li><strong>Cam Kubasta</strong>, Production Coordinator. Cam handles the pre-production details, scheduling, and white-glove coordination leading up to filming so your experience is organized, simple, and smooth from start to finish.</li>\n  <li><strong>Director of Photography</strong>. Your DP brings 25+ years of production experience and oversees the technical side of filming, including camera, lighting, audio, and the WebOuts remote filming systems.</li>\n</ul>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One thing worth knowing:</strong> your film team isn't part of the {{org}} staff. Each member is dedicated to your profile video, whether they're on set with you or supporting your production behind the scenes. A cancellation doesn't just carry a real cost for {{org}}. It delays the tool that helps new patients find you, choose you, and build your practice. Your community is waiting to meet you, and so are we.</p>\n</div>\n\n<p>No preparation needed. Your film coach will guide you through everything on the day. Have a question? Just reply to this email.</p>\n\n<p>We can't wait to see you on camera,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "crew-showcase-filming-tomorrow",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Your Team Is Ready",
+      "blurb": "Short day-before note with logistics and a photo strip of the crew who will be there.",
+      "timing": "The day before filming",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Reminder: Your Filming Is Tomorrow and Your Team Is Ready",
+      "body": "<h2>Your Filming Is Tomorrow</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your filming is <strong>tomorrow</strong>. A professional production team has already been contracted and coordinated around your 1-hour session, so we appreciate you keeping this time protected.</p>\n\n<p>During your appointment, we'll coach you through creating a provider profile video that makes a real difference for patients deciding who to trust with their care. Patients who engage with a provider profile video are more than 60% more likely to call or click to schedule an appointment, making this a powerful practice-building tool.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR FILMING</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>WHERE</strong> {{filmingLocation}}</li>\n  </ul>\n</div>\n\n<p><strong>Your team is ready</strong></p>\n<ul>\n  <li><strong>{{contact}}</strong>, {{org}}</li>\n  <li><strong>Craig Smoll</strong>, Co-Owner / Filming Coach</li>\n  <li><strong>Hair &amp; Makeup</strong></li>\n  <li><strong>Cam Kubasta</strong>, Production Coordinator</li>\n  <li><strong>Director of Photography</strong></li>\n</ul>\n\n<p>We can't wait to see you on camera,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "crew-showcase-interview-week",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Script Interview One Week Out",
+      "blurb": "Sets expectations for the script interview and introduces the writer a week ahead.",
+      "timing": "Seven days before the script interview",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Your {{org}} Script Interview Is One Week Away: Where Your Video Begins",
+      "body": "<h2>Your Script Interview Is One Week Away</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your script interview is <strong>one week away</strong>. This is a relaxed, 20-minute phone call designed to capture how you naturally speak with patients and create a profile script that feels authentic to you.</p>\n\n<p>No preparation, writing, or rehearsal is needed. The call is recorded so our writing team can preserve your speaking style, perspective, and personality, which we think of as your unique \"fingerprint,\" in a polished script of approximately 225 words for your review.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR SCRIPT INTERVIEW</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>HOW</strong> A relaxed phone conversation. We will call you at the mobile number you provided.</li>\n  </ul>\n</div>\n\n<p><strong>Meet your interviewer</strong></p>\n<p><strong>{{sender}}</strong>, Script Writer. Your scriptwriter will guide you through straightforward questions about how you care for patients and what you want them to understand before choosing you.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One thing worth knowing:</strong> your script, your filming day, and your finished video all build from this one conversation. A cancellation pushes back the tool that helps new patients find you, choose you, and build your practice. Your community is waiting to meet you, and so are we.</p>\n</div>\n\n<p>Have a question? Just reply to this email.</p>\n\n<p>We can't wait to hear your story,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "crew-showcase-interview-tomorrow",
+      "channel": "email",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Script Interview Tomorrow",
+      "blurb": "Brief day-before note with call details and one tip for answering naturally.",
+      "timing": "The day before the script interview",
+      "from": "Cam Kubasta <ckubasta@webouts.com>",
+      "subject": "Reminder: Your Script Interview Is Tomorrow",
+      "body": "<h2>Your Script Interview Is Tomorrow</h2>\n<p>A note from your WebOuts Media team</p>\n\n<p><strong>{{provider}},</strong></p>\n\n<p>Your script interview is <strong>tomorrow</strong>. This is a relaxed, 20-minute phone call designed to capture how you naturally speak with patients and create a profile script that feels authentic to you.</p>\n\n<p>No preparation, writing, or rehearsal is needed. Just answer naturally, and we will take it from there.</p>\n\n<div class=\"wo-ml-card\">\n  <p><strong>YOUR SCRIPT INTERVIEW</strong></p>\n  <ul>\n    <li><strong>WHEN</strong> {{date}} at {{time}}</li>\n    <li><strong>HOW</strong> A relaxed phone conversation. We will call you at the mobile number you provided.</li>\n  </ul>\n</div>\n\n<div class=\"wo-ml-card\">\n  <p><strong>One tip before we talk:</strong> answer as if a patient just asked you the question. Your script is built from your own words on this call, so the way you naturally explain things to your patients is exactly what we're listening for.</p>\n</div>\n\n<p><strong>Meet your interviewer</strong></p>\n<p><strong>{{sender}}</strong>, Script Writer. Your writer will guide you through straightforward, patient-focused questions and make the call feel easy from start to finish.</p>\n\n<p>We can't wait to hear your story,</p>\n\n<p><strong>Cam Kubasta</strong><br>Pre-Production Coordinator, WebOuts Medical Media<br><a href=\"#\">ckubasta@webouts.com</a></p>"
+    },
+    {
+      "id": "training-video-nudge",
+      "channel": "sms",
+      "stage": "ongoing",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Training video nudge",
+      "blurb": "Sent ahead of filming so the provider knows the team and walks in prepared.",
+      "timing": "When training reminder is turned on for a provider",
+      "body": "WebOuts: Meet the team and prep for a confident shoot. Watch our 6-min training: {{link}}"
+    },
+    {
+      "id": "draft-script-sent",
+      "channel": "sms",
+      "stage": "script",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Draft script sent",
+      "blurb": "Goes out the moment the draft script email lands, so it does not sit unopened.",
+      "timing": "When the draft script email is sent",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your profile script draft is in your inbox and ready for review."
+    },
+    {
+      "id": "final-script-sent",
+      "channel": "sms",
+      "stage": "script",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Final script sent",
+      "blurb": "Lets the provider know the final script is ready and nudges them to rehearse it.",
+      "timing": "When the final script email is sent",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your final script has been sent to your inbox. Practicing it aloud a few times before filming will help you feel confident on camera."
+    },
+    {
+      "id": "approval-reminder-1-week",
+      "channel": "sms",
+      "stage": "script",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Approval reminder, 1 week out",
+      "blurb": "A week before filming, reminds the provider to review and approve their script.",
+      "timing": "One week before the filming date",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your filming session is coming up soon. Please review and approve your script if you haven't yet."
+    },
+    {
+      "id": "approval-due-tomorrow",
+      "channel": "sms",
+      "stage": "script",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Approval due tomorrow",
+      "blurb": "Last call on script approval, with a clear default if we do not hear back.",
+      "timing": "One day before the approval deadline",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your script approval is due tomorrow. If we don't hear back we'll proceed with the current version into filming prep. Just reply or check your inbox if you'd like any changes."
+    },
+    {
+      "id": "approval-nudge-5-days-after",
+      "channel": "sms",
+      "stage": "script",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Approval nudge, 5 days after",
+      "blurb": "A light follow-up when a script draft has been waiting on approval for five days.",
+      "timing": "Five days after the draft was sent with no reply",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, a friendly nudge: your script draft from last week is still waiting for your approval whenever you have a moment. It's in your inbox, or reply here with any questions."
+    },
+    {
+      "id": "both-bookings-confirmed",
+      "channel": "sms",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Both bookings confirmed",
+      "blurb": "Confirms the provider is fully booked once interview and filming are both on the calendar.",
+      "timing": "First time both interview and filming dates are set",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, you're all set. Your script interview and filming are both booked. Check your inbox for the calendar invites."
+    },
+    {
+      "id": "filming-date-updated",
+      "channel": "sms",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Filming date updated",
+      "blurb": "Tells the provider their filming date moved and a fresh invite is on the way.",
+      "timing": "When the filming date changes after booking",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your filming date has been updated. A new calendar invite has been sent to your inbox."
+    },
+    {
+      "id": "interview-date-updated",
+      "channel": "sms",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Interview date updated",
+      "blurb": "Tells the provider their script interview moved and a fresh invite is on the way.",
+      "timing": "When the script interview date changes after booking",
+      "body": "WebOuts: Hi Dr. {{providerLastName}}, your script interview date has been updated. A new calendar invite has been sent to your inbox."
+    },
+    {
+      "id": "filming-one-week-away",
+      "channel": "sms",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Filming one week away",
+      "blurb": "A week out, confirms the filming details and builds anticipation for the shoot.",
+      "timing": "Exactly seven days before the filming date",
+      "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your profile video filming is one week away: {{date}} at {{time}}, {{filmingLocation}}. We've hand-picked a film team dedicated to your video, and your community is waiting to meet you. Full details are in your email. Questions? Just reply here."
+    },
+    {
+      "id": "filming-tomorrow",
+      "channel": "sms",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Filming tomorrow",
+      "blurb": "Day-before reminder that removes prep anxiety and locks in attendance.",
+      "timing": "The day before the filming date",
+      "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your filming is tomorrow at {{time}}, {{filmingLocation}}. Your team is ready and it can't happen without you. Come as you are: hair, makeup, and coaching are all taken care of. See you tomorrow!"
+    },
+    {
+      "id": "interview-one-week-away",
+      "channel": "sms",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Interview one week away",
+      "blurb": "A week out, sets expectations that the script interview is a relaxed phone call.",
+      "timing": "Exactly seven days before the script interview",
+      "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your script interview is one week away: {{date}} at {{time}}. It's a relaxed phone call, and it's where your profile video begins. We'll call you at this number. Questions? Just reply here."
+    },
+    {
+      "id": "interview-tomorrow",
+      "channel": "sms",
+      "stage": "filming",
+      "sentBy": "WebOuts",
+      "audience": "Provider",
+      "title": "Interview tomorrow",
+      "blurb": "Day-before reminder for the script interview, with one tip on how to answer.",
+      "timing": "The day before the script interview",
+      "body": "Hi Dr. {{providerLastName}}, it's the WebOuts team. Your script interview is tomorrow at {{time}}, and we'll call you. No preparation needed, and one tip: answer like a patient just asked you the question. Your own words become your script. Talk soon!"
+    },
+    {
+      "id": "leadership-filming-reminder",
+      "channel": "email",
+      "stage": "client-sent",
+      "sentBy": "Your organization",
+      "audience": "Provider",
+      "copyable": true,
+      "title": "Leadership filming reminder",
+      "blurb": "Your leadership sends this so providers treat the filming date as a priority.",
+      "timing": "Less than one week before filming",
+      "from": "{{sender}}",
+      "to": "Dr. {{providerLastName}}",
+      "subject": "Important Reminder: Your Physician Profile Filming Is Confirmed for {{date}}",
+      "body": "<p>Dr. {{providerLastName}},</p>\n<p>Your physician profile filming is less than one week away. This 1-hour session creates a long-term practice-building tool that helps patients connect with you, build trust in {{org}}, and feel confident calling or clicking to schedule an appointment.</p>\n<p>Patients who watched a provider profile video were more than 60% more likely to call or click to schedule an appointment than those who did not. Your video also gives patients a personal introduction to you and {{org}} before their first visit.</p>\n<p>A professional production team has already been contracted, and dedicated resources have been coordinated around your appointment. Last-minute cancellations or rescheduling create real production costs and delay when your video can begin supporting your practice.</p>\n<p>Please make every effort to attend your appointment as scheduled. Our team will guide you through the entire session and make the filming process comfortable, efficient, and easy.</p>\n<p>If you have any questions or concerns before filming, please reach out. Our team is looking forward to working with you on set.</p>"
+    }
+  ];
+
   var STYLE = `
   #wo-onb{max-width:720px;margin:0 auto;padding:8px 16px 72px;font-family:'Poppins',Arial,Helvetica,sans-serif;color:#1f2430;line-height:1.5}
   #wo-onb h1{color:#07378C;font-size:27px;font-weight:800;margin:6px 0 6px;letter-spacing:-.4px;text-align:center}
@@ -120,6 +480,72 @@
   #wo-onb .sec:not(.open) .intro,#wo-onb .sec:not(.open) .secbody{display:none}
   #wo-onb .sec:not(.open) h2{margin-bottom:0}
 
+  /* communication samples */
+  #wo-onb .wo-cs-grp{margin:0 0 20px}
+  #wo-onb .wo-cs-grp:last-child{margin-bottom:0}
+  #wo-onb .wo-cs-grph{font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#8a93a3;margin:0 0 9px}
+  #wo-onb .wo-cs-grid{display:flex;flex-wrap:wrap;gap:10px}
+  #wo-onb .wo-cs-card{position:relative;flex:1 1 195px;min-width:170px;max-width:100%;box-sizing:border-box;border:1px solid #e6e9ef;border-radius:11px;background:#fff;padding:13px 14px;text-align:left;cursor:pointer;font-family:inherit;font-weight:400;font-size:14px;transition:border-color .15s,box-shadow .15s,transform .15s}
+  #wo-onb .wo-cs-card:hover,#wo-onb .wo-cs-card:focus-visible{border-color:#07378C;box-shadow:0 8px 22px rgba(7,55,140,.13);transform:translateY(-1px);outline:none}
+  #wo-onb .wo-cs-card>span,#wo-onb .wo-cs-tip>span{display:block}
+  #wo-onb .wo-cs-card>span.wo-cs-tags{display:flex;flex-wrap:wrap;gap:5px}
+  #wo-onb .wo-cs-tag{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:3px 7px;border-radius:5px;white-space:nowrap}
+  #wo-onb .wo-cs-tag.email{background:#eef2fb;color:#07378C}
+  #wo-onb .wo-cs-tag.sms{background:#e8f6ee;color:#2F8F5C}
+  #wo-onb .wo-cs-tag.you{background:#FDEFE9;color:#b3411f}
+  #wo-onb .wo-cs-t{font-size:14px;font-weight:700;color:#07378C;margin:8px 0 3px;line-height:1.3}
+  #wo-onb .wo-cs-b{font-size:12.5px;color:#5b6472;line-height:1.45}
+  #wo-onb .wo-cs-w{font-size:11.5px;color:#9aa4b4;margin-top:8px}
+  #wo-onb .wo-cs-open{font-size:11.5px;font-weight:700;color:#E26337;margin-top:8px}
+  /* hover preview */
+  #wo-onb .wo-cs-tip{position:absolute;left:50%;bottom:calc(100% + 11px);width:250px;transform:translateX(-50%) translateY(8px);background:#fff;border:1px solid #e3e9f3;border-radius:12px;box-shadow:0 14px 36px rgba(10,57,154,.22);padding:12px 13px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:60;text-align:left}
+  #wo-onb .wo-cs-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top-color:#fff}
+  #wo-onb .wo-cs-card:hover .wo-cs-tip,#wo-onb .wo-cs-card:focus-visible .wo-cs-tip{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+  #wo-onb .wo-cs-tips{font-size:11px;font-weight:700;color:#8a93a3;text-transform:uppercase;letter-spacing:.4px;margin:0 0 5px}
+  #wo-onb .wo-cs-tipb{font-size:12px;color:#4b5563;line-height:1.5;max-height:112px;overflow:hidden;white-space:pre-wrap}
+  #wo-onb .wo-cs-tipf{font-size:11px;color:#9aa4b4;margin-top:7px}
+  /* modal */
+  #wo-onb .wo-cs-ov{position:fixed;inset:0;background:rgba(16,24,40,.62);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
+  #wo-onb .wo-cs-ov[hidden]{display:none}
+  #wo-onb .wo-cs-md{background:#fff;border-radius:14px;width:100%;max-width:640px;margin:auto;box-shadow:0 24px 60px rgba(16,24,40,.3);overflow:hidden}
+  #wo-onb .wo-cs-mh{display:flex;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid #eef0f4}
+  #wo-onb .wo-cs-mh h3{margin:0;font-size:17px;font-weight:700;color:#07378C;line-height:1.3}
+  #wo-onb .wo-cs-mh .wo-cs-w{margin-top:4px}
+  #wo-onb .wo-cs-x{margin-left:auto;flex:0 0 auto;background:#f2f4f8;color:#5b6472;font-size:17px;line-height:1;padding:7px 11px;border-radius:8px}
+  #wo-onb .wo-cs-x:hover{background:#e6e9ef;color:#1f2430}
+  #wo-onb .wo-cs-mb{padding:18px 20px;background:#f7f9fc;max-height:none}
+  #wo-onb .wo-cs-mf{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid #eef0f4}
+  #wo-onb .wo-cs-note{font-size:12px;color:#8a93a3;flex:1 1 200px;line-height:1.45}
+  #wo-onb .wo-cs-copy{background:#E26337;color:#fff}
+  #wo-onb .wo-cs-copy:hover{filter:brightness(1.05)}
+  /* email sheet */
+  #wo-onb .wo-cs-sheet{background:#fff;border:1px solid #e6e9ef;border-radius:11px;overflow:hidden}
+  #wo-onb .wo-cs-mail{padding:13px 17px;border-bottom:1px solid #eef0f4;background:#fbfcfe}
+  #wo-onb .wo-cs-mailr{font-size:12.5px;color:#5b6472;margin:2px 0;overflow-wrap:anywhere}
+  #wo-onb .wo-cs-mailr b{color:#1f2430;font-weight:700}
+  #wo-onb .wo-cs-body{padding:18px 20px;font-size:14px;line-height:1.6;color:#1f2430;overflow-wrap:anywhere}
+  #wo-onb .wo-cs-body p{margin:0 0 13px}
+  #wo-onb .wo-cs-body p:last-child{margin-bottom:0}
+  #wo-onb .wo-cs-body h2{font-size:16px;color:#07378C;margin:0 0 10px}
+  #wo-onb .wo-cs-body ul{margin:0 0 13px;padding-left:20px}
+  #wo-onb .wo-cs-body li{margin:0 0 6px}
+  #wo-onb .wo-cs-body a{color:#07378C}
+  #wo-onb .wo-ml-card{border:1px solid #e3e9f3;border-left:3px solid #07378C;border-radius:8px;background:#f7f9fc;padding:13px 15px;margin:0 0 13px}
+  #wo-onb .wo-ml-btn{display:inline-block;background:#E26337;color:#fff;font-weight:700;font-size:14px;padding:11px 22px;border-radius:8px;text-decoration:none;margin:2px 0 13px}
+  /* sms phone */
+  #wo-onb .wo-cs-phone{max-width:330px;margin:0 auto;background:#fff;border:1px solid #e6e9ef;border-radius:22px;padding:16px 14px 20px}
+  #wo-onb .wo-cs-phoneh{text-align:center;font-size:11.5px;color:#9aa4b4;border-bottom:1px solid #eef0f4;padding-bottom:10px;margin-bottom:14px}
+  #wo-onb .wo-cs-bub{background:#e9edf4;color:#1f2430;border-radius:16px 16px 16px 4px;padding:11px 14px;font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+  /* mad lib tokens */
+  #wo-onb .wo-ml{background:#fdf0e9;border-bottom:1.5px solid #E26337;border-radius:3px;padding:0 3px;font-weight:600;color:#b3411f;cursor:text}
+  #wo-onb .wo-ml.filled{background:#eaf3ea;border-bottom-color:#2F8F5C;color:#1f6b41}
+  #wo-onb .wo-ml:focus{outline:2px solid #07378C;outline-offset:1px;background:#fff}
+  @media (max-width:520px){
+    #wo-onb .wo-cs-card>span.wo-cs-tip{display:none}
+    #wo-onb .wo-cs-card{flex:1 1 100%}
+    #wo-onb .wo-cs-ov{padding:12px 8px}
+  }
+
   /* paste from spreadsheet */
   #wo-onb .pastebox{margin:12px 0 0}
   #wo-onb .pastetoggle{background:#eef2fb;color:#07378C;font-weight:600;font-size:13px;padding:8px 14px}
@@ -158,7 +584,7 @@
     <p class="sub">This is how we get ready to film your providers. It takes about 10 minutes, and you don’t need every answer today. This works best as a team effort: copy your private link above and pass it around so the right person fills in each section. Everything saves as you go, so anyone can stop and pick up later.</p>
 
     <div id="wo-form">
-      <div class="sec">
+      <div class="sec" data-sec="org">
         <h2><span class="num">1</span> Your organization</h2>
         <div class="secbody">
           <div class="fld"><label>Organization name</label><input type="text" data-key="identity.displayName"></div>
@@ -167,7 +593,7 @@
         </div>
       </div>
 
-      <div class="sec">
+      <div class="sec" data-sec="people">
         <h2><span class="num">2</span> Key people &amp; approvals</h2>
         <p class="intro">Who we’ll be working with, and who signs off.</p>
         <div class="secbody">
@@ -179,7 +605,7 @@
         </div>
       </div>
 
-      <div class="sec">
+      <div class="sec" data-sec="providers">
         <h2><span class="num">3</span> Providers to feature</h2>
         <div class="secbody">
           <div class="help">List the providers you’d like to feature, and include about <strong>50% more than your first-round target</strong> so we can cover scheduling conflicts (targeting 16? list 24. A full week of 40? list 60). Type directly, or paste your whole list from a spreadsheet.</div>
@@ -195,7 +621,7 @@
         </div>
       </div>
 
-      <div class="sec">
+      <div class="sec" data-sec="filming">
         <h2><span class="num">4</span> Filming logistics</h2>
         <div class="secbody">
           <div class="fld"><label>Filming address</label><div class="help">Where should our crew come to film?</div><input type="text" data-key="filming.location"></div>
@@ -203,7 +629,7 @@
         </div>
       </div>
 
-      <div class="sec">
+      <div class="sec" data-sec="look">
         <h2><span class="num">5</span> Look, sound &amp; SEO</h2>
         <p class="intro">How you’d like the videos to feel. Share what you have, and we’ll fill any gaps.</p>
         <div class="secbody">
@@ -213,16 +639,25 @@
         </div>
       </div>
 
-      <div class="sec">
-        <h2><span class="num">6</span> Brand guidelines</h2>
+      <div class="sec" data-sec="samples">
+        <h2><span class="num">6</span> What your team and providers will receive</h2>
+        <p class="intro">Every email and text we send, so nothing is a surprise. Hover to preview, click to read the whole thing.</p>
+        <div class="secbody">
+          <div class="help">These are real templates with the names taken out. As you fill in the rest of this form, the <span class="wo-ml filled">highlighted blanks</span> fill themselves in with your details. You can also click any blank and type your own wording to see how it reads.</div>
+          <div id="wo-cs-list"></div>
+        </div>
+      </div>
+
+      <div class="sec" data-sec="brand">
+        <h2><span class="num">7</span> Brand guidelines</h2>
         <div class="secbody">
           <div class="help">Upload your brand guidelines (PDF or image, up to 10&nbsp;MB each). Add as many as you like: style guide, logo files, colors and fonts. Something larger? Email it and we’ll attach it.</div>
           ${uploadHTML('brand', 'Files attach straight to your onboarding record.')}
         </div>
       </div>
 
-      <div class="sec">
-        <h2><span class="num">7</span> Anything else</h2>
+      <div class="sec" data-sec="misc">
+        <h2><span class="num">8</span> Anything else</h2>
         <div class="secbody">
           <div class="help">Anything else we should know that didn’t fit above.</div>
           <textarea data-key="misc.notes" aria-label="Anything else"></textarea>
@@ -230,6 +665,23 @@
       </div>
 
       <button type="button" class="submit" id="wo-submit">I’m done, submit for review</button>
+    </div>
+
+    <div class="wo-cs-ov" id="wo-cs-ov" hidden>
+      <div class="wo-cs-md" role="dialog" aria-modal="true" aria-labelledby="wo-cs-mt">
+        <div class="wo-cs-mh">
+          <div>
+            <h3 id="wo-cs-mt"></h3>
+            <div class="wo-cs-w" id="wo-cs-mw"></div>
+          </div>
+          <button type="button" class="wo-cs-x" id="wo-cs-x" aria-label="Close">✕</button>
+        </div>
+        <div class="wo-cs-mb" id="wo-cs-mb"></div>
+        <div class="wo-cs-mf">
+          <span class="wo-cs-note" id="wo-cs-note"></span>
+          <button type="button" class="wo-cs-copy" id="wo-cs-copy" style="display:none">Copy email text</button>
+        </div>
+      </div>
     </div>
 
     <div class="done" id="wo-done" style="display:none">
@@ -433,7 +885,9 @@
   var secs = Array.prototype.slice.call(root.querySelectorAll('#wo-form > .sec'));
   var doneSecs = {};
   secs.forEach(function (sec, i) {
-    sec.setAttribute('data-sec', SEC_SLUGS[i] || ('s' + i));
+    // Slugs are declared in the markup so sections can be reordered without
+    // remapping saved _done state; the positional list is the legacy fallback.
+    if (!sec.getAttribute('data-sec')) sec.setAttribute('data-sec', SEC_SLUGS[i] || ('s' + i));
     var h = sec.querySelector('h2');
     h.setAttribute('role', 'button');
     h.setAttribute('tabindex', '0');
@@ -468,6 +922,193 @@
       var t = sec.querySelector('.done-toggle'); if (t) t.setAttribute('aria-checked', on ? 'true' : 'false');
     });
   }
+
+  // ---- communication samples (read-only previews with fill-in-the-blank tokens) ----
+  // Tokens read straight from the live form, so samples personalize as the client types.
+  // Manual edits to a blank are session-only: nothing here adds a saved field.
+  var CREDS = { md: 1, do: 1, phd: 1, rn: 1, np: 1, pa: 1, dds: 1, dmd: 1, msn: 1, facs: 1, faap: 1, jr: 1, sr: 1, ii: 1, iii: 1 };
+  function fval(key) { var el = root.querySelector('[data-key="' + key + '"]'); return el ? el.value.trim() : ''; }
+  function cell(key, col) {
+    var v = fval(key); if (!v) return '';
+    return (v.split('\n')[0].split(' | ')[col] || '').trim();
+  }
+  function lastName(full) {
+    var parts = String(full || '').replace(/,/g, ' ').split(/\s+/).filter(Boolean);
+    while (parts.length > 1 && CREDS[parts[parts.length - 1].toLowerCase().replace(/\./g, '')]) parts.pop();
+    return parts.length ? parts[parts.length - 1] : '';
+  }
+  var TOKENS = {
+    org: { ph: 'Your Organization', get: function () { return fval('identity.displayName'); } },
+    provider: { ph: 'Provider Name', get: function () { return cell('providers.launchList', 0); } },
+    providerLastName: { ph: 'Last Name', get: function () { return lastName(cell('providers.launchList', 0)); } },
+    specialty: { ph: 'Specialty', get: function () { return cell('providers.launchList', 1); } },
+    contact: { ph: 'Your Contact', get: function () { return cell('contacts.list', 0); } },
+    sender: { ph: 'Leadership Sender', get: function () { return fval('rollout.leadershipSender'); } },
+    filmingLocation: { ph: 'Filming Location', get: function () { return fval('filming.location'); } },
+    date: { ph: 'Filming Date', get: function () { return ''; } },
+    time: { ph: 'Time', get: function () { return ''; } },
+    link: { ph: 'link', get: function () { return ''; } }
+  };
+  var overrides = {};
+  function tokenVal(k) {
+    if (overrides[k]) return { v: overrides[k], filled: true };
+    var g = TOKENS[k].get();
+    return g ? { v: g, filled: true } : { v: '[' + TOKENS[k].ph + ']', filled: false };
+  }
+  function fillText(s) {
+    return String(s).replace(/\{\{(\w+)\}\}/g, function (m, k) { return TOKENS[k] ? tokenVal(k).v : m; });
+  }
+  function fillHTML(s) {
+    return String(s).replace(/\{\{(\w+)\}\}/g, function (m, k) {
+      if (!TOKENS[k]) return m;
+      var t = tokenVal(k);
+      return '<span class="wo-ml' + (t.filled ? ' filled' : '') + '" data-token="' + k + '" contenteditable="true" spellcheck="false" role="textbox" tabindex="0">' + esc(t.v) + '</span>';
+    });
+  }
+  function repaintTokens(except) {
+    Array.prototype.forEach.call(root.querySelectorAll('[data-token]'), function (el) {
+      if (el === except) return;
+      var t = tokenVal(el.getAttribute('data-token'));
+      if (el.textContent !== t.v) el.textContent = t.v;
+      el.classList.toggle('filled', t.filled);
+    });
+  }
+
+  var GROUPS = [
+    { stage: 'kickoff', label: 'Kickoff and scheduling' },
+    { stage: 'script', label: 'Script review and approval' },
+    { stage: 'filming', label: 'Filming preparation' },
+    { stage: 'ongoing', label: 'Ongoing texts' },
+    { stage: 'client-sent', label: 'You send this one' }
+  ];
+  function tagsHTML(s) {
+    var h = '<span class="wo-cs-tag ' + (s.channel === 'sms' ? 'sms">Text' : 'email">Email') + '</span>';
+    if (s.sentBy !== 'WebOuts') h += '<span class="wo-cs-tag you">You send this</span>';
+    return h;
+  }
+  function previewText(s) {
+    var t = s.channel === 'sms' ? fillText(s.body)
+      : fillText(String(s.body).replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+    return t.length > 210 ? t.slice(0, 210).replace(/\s\S*$/, '') + '…' : t;
+  }
+  function cardHTML(s) {
+    return '<button type="button" class="wo-cs-card" data-id="' + esc(s.id) + '">'
+      + '<span class="wo-cs-tags">' + tagsHTML(s) + '</span>'
+      + '<span class="wo-cs-t">' + esc(s.title) + '</span>'
+      + '<span class="wo-cs-b">' + esc(s.blurb) + '</span>'
+      + '<span class="wo-cs-w">' + esc(s.timing) + '</span>'
+      + '<span class="wo-cs-open">Click to read it &rsaquo;</span>'
+      + '<span class="wo-cs-tip" aria-hidden="true">'
+      + '<span class="wo-cs-tips">' + (s.channel === 'sms' ? 'Text message' : 'Subject') + '</span>'
+      + '<span class="wo-cs-tipb">' + esc(s.channel === 'sms' ? previewText(s) : fillText(s.subject)) + '</span>'
+      + '<span class="wo-cs-tipf">' + (s.channel === 'sms' ? 'Click to read it' : 'Click to read the whole email') + '</span>'
+      + '</span></button>';
+  }
+  var listEl = document.getElementById('wo-cs-list');
+  function renderSamples() {
+    listEl.innerHTML = GROUPS.map(function (g) {
+      var items = SAMPLES.filter(function (s) { return s.stage === g.stage; });
+      if (!items.length) return '';
+      return '<div class="wo-cs-grp"><div class="wo-cs-grph">' + esc(g.label) + '</div>'
+        + '<div class="wo-cs-grid">' + items.map(cardHTML).join('') + '</div></div>';
+    }).join('');
+  }
+
+  // ---- sample modal ----
+  var ovEl = document.getElementById('wo-cs-ov');
+  var mdTitle = document.getElementById('wo-cs-mt');
+  var mdWhen = document.getElementById('wo-cs-mw');
+  var mdBody = document.getElementById('wo-cs-mb');
+  var mdNote = document.getElementById('wo-cs-note');
+  var mdCopy = document.getElementById('wo-cs-copy');
+  var mdClose = document.getElementById('wo-cs-x');
+  var lastFocus = null, openSample = null;
+
+  function bodyHTML(s) {
+    if (s.channel === 'sms') {
+      return '<div class="wo-cs-phone"><div class="wo-cs-phoneh">Text message from WebOuts</div>'
+        + '<div class="wo-cs-bub">' + fillHTML(esc(s.body)) + '</div></div>';
+    }
+    return '<div class="wo-cs-sheet"><div class="wo-cs-mail">'
+      + '<div class="wo-cs-mailr"><b>From:</b> ' + fillHTML(esc(s.from)) + '</div>'
+      + '<div class="wo-cs-mailr"><b>To:</b> ' + fillHTML(esc(s.to || '{{provider}}')) + '</div>'
+      + '<div class="wo-cs-mailr"><b>Subject:</b> ' + fillHTML(esc(s.subject)) + '</div>'
+      + '</div><div class="wo-cs-body">' + fillHTML(s.body) + '</div></div>';
+  }
+  function openModal(id) {
+    var s = null;
+    SAMPLES.forEach(function (x) { if (x.id === id) s = x; });
+    if (!s) return;
+    openSample = s;
+    lastFocus = document.activeElement;
+    mdTitle.textContent = s.title;
+    mdWhen.textContent = s.timing;
+    mdBody.innerHTML = bodyHTML(s);
+    mdNote.textContent = s.sentBy === 'WebOuts'
+      ? 'WebOuts sends this one automatically.'
+      : 'Your team sends this one. Copy the text and send it from your own email.';
+    mdCopy.style.display = s.copyable ? '' : 'none';
+    mdCopy.textContent = 'Copy email text';
+    ovEl.hidden = false;
+    document.body.style.overflow = 'hidden';
+    mdClose.focus();
+  }
+  function closeModal() {
+    ovEl.hidden = true;
+    openSample = null;
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  listEl.addEventListener('click', function (e) {
+    var card = e.target.closest ? e.target.closest('.wo-cs-card') : null;
+    if (card) openModal(card.getAttribute('data-id'));
+  });
+  mdClose.addEventListener('click', closeModal);
+  ovEl.addEventListener('click', function (e) { if (e.target === ovEl) closeModal(); });
+  ovEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+    if (e.key !== 'Tab') return;
+    var f = Array.prototype.filter.call(
+      ovEl.querySelectorAll('button, [contenteditable="true"]'),
+      function (el) { return el.offsetParent !== null; });
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  mdCopy.addEventListener('click', function () {
+    if (!openSample) return;
+    var sheet = mdBody.querySelector('.wo-cs-body') || mdBody;
+    var txt = 'Subject: ' + fillText(openSample.subject) + '\n\n' + (sheet.innerText || sheet.textContent || '').trim();
+    var btn = this;
+    function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy email text'; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, done);
+    else done();
+  });
+
+  // typing in a blank updates every other copy of that blank, but not the one being edited
+  root.addEventListener('input', function (e) {
+    var t = e.target;
+    if (t && t.getAttribute && t.getAttribute('data-token')) {
+      var k = t.getAttribute('data-token');
+      var v = t.textContent.trim();
+      if (v && v !== '[' + TOKENS[k].ph + ']') overrides[k] = v; else delete overrides[k];
+      t.classList.toggle('filled', tokenVal(k).filled); // style the edited blank without moving the caret
+      repaintTokens(t);
+      return;
+    }
+    if (t && (t.getAttribute && t.getAttribute('data-key') || (t.closest && t.closest('.sstab')))) repaintTokens();
+  });
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target && e.target.getAttribute && e.target.getAttribute('data-token')) {
+      e.preventDefault(); e.target.blur();
+    }
+  });
+  // leaving a blank empty puts its placeholder back
+  root.addEventListener('focusout', function (e) {
+    if (e.target && e.target.getAttribute && e.target.getAttribute('data-token')) repaintTokens();
+  });
+  renderSamples();
 
   // ---- provider bulk paste (Excel / Sheets -> table rows) ----
   var provPasteWrap = document.getElementById('wo-prov-paste');
