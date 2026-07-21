@@ -495,20 +495,68 @@
   #wo-onb button{font-family:inherit;font-weight:700;font-size:14px;border:0;border-radius:9px;padding:10px 18px;cursor:pointer}
   #wo-onb .submit{background:#E26337;color:#fff;font-size:16px;padding:16px 22px;width:100%;margin-top:10px}
   #wo-onb .submit:hover{filter:brightness(1.05)}
-  /* splash: shown only when the URL carries no ?c=, so an emailed link never sees it */
-  #wo-onb #wo-splash{max-width:640px;margin:0 auto;padding:8px 0 40px}
-  #wo-onb .splash-card{border:1px solid #e3e8f0;border-radius:14px;padding:20px 22px;margin:0 0 16px;background:#fff}
-  #wo-onb .splash-card h3{margin:0 0 6px;font-size:17px;color:#07378C}
-  #wo-onb .splash-card p{margin:0 0 14px;font-size:14px;color:#5a6472;line-height:1.5}
-  #wo-onb .splash-row{display:flex;gap:10px;flex-wrap:wrap}
-  #wo-onb .splash-row input{flex:1 1 260px;min-width:0}
-  #wo-onb .splash-go{background:#E26337;color:#fff;border:0;border-radius:10px;padding:11px 20px;font:600 15px/1 inherit;cursor:pointer;white-space:nowrap}
-  #wo-onb .splash-go:hover{background:#c9512a}
-  #wo-onb .splash-err{margin-top:10px;font-size:13.5px;color:#b3411f}
-  #wo-onb .splash-link{background:none;border:0;padding:0;color:#07378C;font:inherit;font-size:inherit;text-decoration:underline;cursor:pointer}
-  #wo-onb #wo-splash-resume{margin-top:12px;font-size:13.5px}
-  #wo-onb .splash-foot{text-align:center;font-size:13.5px;color:#5a6472;margin:22px 0 0}
-  @media (max-width:600px){ #wo-onb .splash-go{width:100%} }
+  /* ---- splash: shown only when the URL carries no ?c=, so an emailed link never sees it ----
+     Everything animates on entrance with pure CSS delays; there is no JS timeline to
+     fall out of sync, and prefers-reduced-motion turns the movement off wholesale. */
+  #wo-onb #wo-splash{position:relative;overflow:hidden;border-radius:22px;padding:64px 24px 56px;margin:0 auto 8px;max-width:760px;text-align:center;isolation:isolate}
+  #wo-onb .sp-glow{position:absolute;inset:-40% -20%;z-index:-1;pointer-events:none;
+    background:radial-gradient(38% 46% at 28% 32%,rgba(226,99,55,.16),transparent 70%),
+               radial-gradient(42% 50% at 74% 62%,rgba(7,55,140,.14),transparent 72%);
+    animation:sp-drift 22s ease-in-out infinite alternate}
+  @keyframes sp-drift{from{transform:translate3d(-2%,-1%,0) scale(1)}to{transform:translate3d(3%,2%,0) scale(1.12)}}
+  #wo-onb .sp-inner>*{opacity:0;animation:sp-rise .7s cubic-bezier(.16,.84,.44,1) forwards}
+  @keyframes sp-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  #wo-onb .sp-mark{width:58px;height:58px;display:block;margin:0 auto 22px;animation-delay:.05s}
+  #wo-onb .sp-ring{fill:none;stroke:#07378C;stroke-width:2.5;opacity:.28;
+    stroke-dasharray:170;stroke-dashoffset:170;transform-origin:50% 50%;transform:rotate(-90deg);
+    animation:sp-draw 1.5s cubic-bezier(.6,.05,.2,1) .25s forwards}
+  @keyframes sp-draw{to{stroke-dashoffset:0}}
+  #wo-onb .sp-play{fill:#E26337;opacity:0;transform-origin:32px 32px;
+    animation:sp-pop .6s cubic-bezier(.2,1.5,.4,1) 1.05s forwards}
+  @keyframes sp-pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+  #wo-onb .sp-title{font-size:34px;line-height:1.15;color:#07378C;margin:0 0 14px;letter-spacing:-.02em;animation-delay:.18s}
+  #wo-onb .sp-sub{font-size:16.5px;line-height:1.6;color:#5a6472;margin:0 auto 34px;max-width:46ch;animation-delay:.28s}
+  #wo-onb .sp-actions{display:flex;flex-direction:column;align-items:center;gap:16px;animation-delay:.38s}
+  #wo-onb .sp-cta{position:relative;overflow:hidden;background:#E26337;color:#fff;border:0;border-radius:999px;
+    padding:15px 38px;font:600 16px/1 inherit;cursor:pointer;box-shadow:0 8px 22px rgba(226,99,55,.28);
+    transition:transform .25s cubic-bezier(.16,.84,.44,1),box-shadow .25s}
+  #wo-onb .sp-cta:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(226,99,55,.36)}
+  #wo-onb .sp-cta:active{transform:translateY(0)}
+  #wo-onb .sp-cta span{position:relative;z-index:1}
+  /* a slow sheen that reads as motion without asking for attention */
+  #wo-onb .sp-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);
+    animation:sp-sheen 4.5s ease-in-out 1.6s infinite}
+  @keyframes sp-sheen{0%{left:-60%}45%{left:130%}100%{left:130%}}
+  #wo-onb .sp-quiet{background:none;border:0;padding:4px 2px;color:#07378C;font:inherit;font-size:14.5px;cursor:pointer;
+    border-bottom:1px solid rgba(7,55,140,.28);transition:border-color .2s,color .2s}
+  #wo-onb .sp-quiet:hover{color:#E26337;border-bottom-color:rgba(226,99,55,.5)}
+  /* opacity:1 is load-bearing: .sp-inner>* sets opacity:0 for the entrance, and this
+     animation has no fill mode, so without it the revealed field lands back invisible. */
+  #wo-onb .sp-paste{max-width:440px;margin:22px auto 0;opacity:1;animation:sp-open .45s cubic-bezier(.16,.84,.44,1)}
+  @keyframes sp-open{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  #wo-onb .sp-paste[hidden]{display:none}
+  #wo-onb .sp-row{display:flex;gap:9px}
+  #wo-onb .sp-row input{flex:1 1 auto;min-width:0;border-radius:999px;padding:12px 18px}
+  #wo-onb .sp-go{background:#07378C;color:#fff;border:0;border-radius:999px;padding:12px 22px;font:600 15px/1 inherit;cursor:pointer;transition:background .2s}
+  #wo-onb .sp-go:hover{background:#052a6b}
+  #wo-onb .sp-err{margin-top:10px;font-size:13.5px;color:#b3411f;text-align:left}
+  #wo-onb #wo-splash-resume{margin-top:20px;animation-delay:.46s}
+  #wo-onb .sp-foot{margin:38px 0 0;animation-delay:.54s}
+  #wo-onb .sp-foot .sp-quiet{font-size:13.5px;color:#7a8494;border-bottom-color:rgba(122,132,148,.3)}
+  @media (max-width:600px){
+    #wo-onb #wo-splash{padding:44px 16px 40px}
+    #wo-onb .sp-title{font-size:27px}
+    #wo-onb .sp-sub{font-size:15.5px;margin-bottom:28px}
+    #wo-onb .sp-cta{width:100%}
+    #wo-onb .sp-row{flex-direction:column}
+    #wo-onb .sp-go{width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){
+    #wo-onb .sp-inner>*,#wo-onb .sp-ring,#wo-onb .sp-play,#wo-onb .sp-glow,#wo-onb .sp-paste{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}
+    #wo-onb .sp-cta::after{animation:none;display:none}
+    #wo-onb .sp-cta:hover{transform:none}
+  }
   #wo-onb .locked{background:#FFF4EF;border:1px solid #f3c9bb;border-radius:11px;padding:14px 16px;color:#7a2e12;margin-bottom:18px;font-size:14px}
   #wo-onb .done{text-align:center;padding:48px 16px}
   #wo-onb .done h1{font-size:28px}
@@ -656,24 +704,28 @@
   var HTML = `
   <div id="wo-onb">
     <div id="wo-splash" style="display:none">
-      <h1>Welcome to WebOuts</h1>
-      <p class="sub">This is where we gather everything we need to film your providers. It takes about 10 minutes, and you don’t need every answer today.</p>
-      <div class="splash-card">
-        <h3>Already started?</h3>
-        <p>Paste the private link WebOuts sent you, or the one you saved.</p>
-        <div class="splash-row">
-          <input type="text" id="wo-splash-link" placeholder="https://webouts.com/onboarding?c=…" aria-label="Your private onboarding link">
-          <button type="button" class="splash-go" id="wo-splash-open">Open</button>
+      <div class="sp-glow" aria-hidden="true"></div>
+      <div class="sp-inner">
+        <svg class="sp-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <circle class="sp-ring" cx="32" cy="32" r="27"></circle>
+          <path class="sp-play" d="M26 21.5 L44 32 L26 42.5 Z"></path>
+        </svg>
+        <h1 class="sp-title">Welcome to WebOuts</h1>
+        <p class="sp-sub">Let’s get your providers ready for camera. About ten minutes, and you don’t need every answer today.</p>
+        <div class="sp-actions">
+          <button type="button" class="sp-cta" id="wo-splash-new"><span>Start a new onboarding</span></button>
+          <button type="button" class="sp-quiet" id="wo-splash-have" aria-expanded="false" aria-controls="wo-splash-paste">I already have a link</button>
         </div>
-        <div class="splash-err" id="wo-splash-err" style="display:none"></div>
-        <div id="wo-splash-resume" style="display:none"><button type="button" class="splash-link" id="wo-splash-resume-btn">Resume the onboarding you started on this device</button></div>
+        <div class="sp-paste" id="wo-splash-paste" hidden>
+          <div class="sp-row">
+            <input type="text" id="wo-splash-link" placeholder="Paste your private link or code" aria-label="Your private onboarding link">
+            <button type="button" class="sp-go" id="wo-splash-open">Open</button>
+          </div>
+          <div class="sp-err" id="wo-splash-err" style="display:none"></div>
+        </div>
+        <div id="wo-splash-resume" style="display:none"><button type="button" class="sp-quiet" id="wo-splash-resume-btn">Resume the onboarding you started on this device</button></div>
+        <p class="sp-foot"><button type="button" class="sp-quiet" id="wo-splash-peek">Preview the form without saving anything</button></p>
       </div>
-      <div class="splash-card">
-        <h3>Starting fresh?</h3>
-        <p>We’ll create a new onboarding and give you a private link to save and share with your team.</p>
-        <button type="button" class="splash-go" id="wo-splash-new">Start a new onboarding</button>
-      </div>
-      <p class="splash-foot">Just want to look around? <button type="button" class="splash-link" id="wo-splash-peek">Preview the form without saving anything</button></p>
     </div>
     <div id="wo-previewmsg" class="locked" style="display:none"><strong>Preview mode.</strong> Nothing you type here is saved and no record is created. To fill this in for real, reload the page and start a new onboarding.</div>
     <div class="bar">
@@ -1510,16 +1562,48 @@
       remember('woOnbToken', t);
       showForm(t);
     });
+    // The paste field starts hidden so the splash is one clear choice rather than a
+    // wall of inputs. Revealing it focuses it, so the click and the typing are one move.
+    var pasteEl = document.getElementById('wo-splash-paste');
+    var haveBtn = document.getElementById('wo-splash-have');
+    haveBtn.addEventListener('click', function () {
+      var open = !pasteEl.hidden;
+      pasteEl.hidden = open;
+      haveBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (!open) document.getElementById('wo-splash-link').focus();
+    });
     var errEl = document.getElementById('wo-splash-err');
+    var openBtn = document.getElementById('wo-splash-open');
     function openPasted() {
       var t = tokenFrom(document.getElementById('wo-splash-link').value);
       if (!t) {
-        errEl.textContent = 'That doesn’t look like an onboarding link. It should look like https://webouts.com/onboarding?c=… — paste the whole thing.';
+        errEl.innerHTML = 'That doesn’t look like an onboarding link. It should look like https://webouts.com/onboarding?c=… — paste the whole thing.';
         errEl.style.display = '';
         return;
       }
       errEl.style.display = 'none';
-      showForm(t);
+      // Any 8-character word is a structurally valid token, so a mistyped link would
+      // silently open an empty form that looks exactly like lost answers. Check first.
+      // A miss is not fatal though: a client who was sent a link but never typed has no
+      // record yet, so offer to open it anyway rather than blocking them out.
+      openBtn.disabled = true;
+      var was = openBtn.textContent;
+      openBtn.textContent = 'Checking…';
+      postJSON(API, { action: 'load', token: t })
+        .then(function (res) {
+          if (res && res.ok === true && res.exists === false) {
+            errEl.innerHTML = 'We couldn’t find any saved answers for that link. Check you copied the whole thing. ';
+            var go = document.createElement('button');
+            go.type = 'button'; go.className = 'sp-quiet'; go.textContent = 'Open it anyway';
+            go.addEventListener('click', function () { showForm(t); });
+            errEl.appendChild(go);
+            errEl.style.display = '';
+            return;
+          }
+          showForm(t); // found it, or the API refused for a reason the form itself will show
+        })
+        .catch(function () { showForm(t); }) // our outage is not their problem
+        .finally(function () { openBtn.disabled = false; openBtn.textContent = was; });
     }
     document.getElementById('wo-splash-open').addEventListener('click', openPasted);
     document.getElementById('wo-splash-link').addEventListener('keydown', function (e) {
