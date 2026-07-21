@@ -576,6 +576,7 @@
   #wo-onb .sec.filled .done-label{color:#2F8F5C}
   #wo-onb .sec .due{flex:0 0 auto;font-size:11px;font-weight:700;letter-spacing:.3px;color:#07378C;background:#eef2fb;border:1px solid #d6e3ff;border-radius:20px;padding:3px 9px;white-space:nowrap}
   #wo-onb .sec .due.past{color:#b3411f;background:#FDEFE9;border-color:#f3c9bb}
+  #wo-onb .sec .due.none{color:#9aa3b0;background:transparent;border:1px dashed #dbe1e9;font-weight:500}
   #wo-onb .sec .chev{width:9px;height:9px;border-right:2px solid #9aa4b4;border-bottom:2px solid #9aa4b4;transform:rotate(-45deg);transition:transform .2s ease;flex:0 0 auto;margin-top:-3px}
   #wo-onb .sec.open .chev{transform:rotate(45deg)}
   #wo-onb .sec:not(.open) .intro,#wo-onb .sec:not(.open) .secbody{display:none}
@@ -678,6 +679,8 @@
     #wo-onb .wo-cs-grid{padding:12px}
     #wo-onb .sec .due{font-size:10.5px;padding:3px 8px}
     #wo-onb .sec.has-due .done-label{display:none}
+    /* the placeholder is an alignment aid; on a phone it would just wrap the title */
+    #wo-onb .sec .due.none{display:none}
     #wo-onb .wo-cs-card>span.wo-cs-tip{display:none}
     #wo-onb .wo-cs-card{flex:1 1 100%}
     #wo-onb .wo-cs-ov{padding:12px 8px}
@@ -1205,14 +1208,22 @@
       if (old) h.removeChild(old);
       sec.classList.remove('has-due');
       var v = dueParts(due[sec.getAttribute('data-sec')]);
-      if (!v) return;
-      var now = new Date();
-      var today = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
       var el = document.createElement('span');
-      el.className = 'due' + ((v.y * 10000 + v.m * 100 + v.d) < today ? ' past' : '');
-      el.textContent = 'Due ' + MON[v.m - 1] + ' ' + v.d + (v.y === now.getFullYear() ? '' : ', ' + v.y);
+      if (v) {
+        var now = new Date();
+        var today = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+        el.className = 'due' + ((v.y * 10000 + v.m * 100 + v.d) < today ? ' past' : '');
+        el.textContent = 'Due ' + MON[v.m - 1] + ' ' + v.d + (v.y === now.getFullYear() ? '' : ', ' + v.y);
+      } else {
+        // Undated sections keep the slot rather than leaving a gap, so headers stay
+        // aligned and a date appearing later does not shove the row around.
+        el.className = 'due none';
+        el.textContent = 'No date set';
+      }
       h.insertBefore(el, h.querySelector('.done-toggle') || null);
-      sec.classList.add('has-due'); // narrow screens drop the "Completed" wording to make room
+      // Only a real date trims the "Completed" wording on narrow screens; the empty
+      // placeholder is hidden there instead, so it can never cost a header a line.
+      if (v) sec.classList.add('has-due');
     });
   }
   // Once WebOuts sets due dates, the form reorders itself to match: soonest first,
@@ -1651,6 +1662,7 @@
       document.getElementById('wo-welcome').style.display = '';
       document.getElementById('wo-welcomesub').style.display = '';
       gfxUp.disable(); brandUp.disable();
+      applyDue({}); // preview never loads, so draw the empty date slots itself
       var sub = document.getElementById('wo-submit');
       if (sub) { sub.disabled = true; sub.textContent = 'Submitting is off in preview'; }
       loaded = true;
