@@ -7,23 +7,36 @@ page, you change the code in GitHub — that's it.
 ## The pieces
 - **Repo:** `TKsmalls/webouts-widgets` (public)
 - **File:** `onboarding.js` (the whole widget: styles + form + logic)
-- **Live URL the page loads:** `https://cdn.jsdelivr.net/gh/TKsmalls/webouts-widgets@main/onboarding.js`
+- **Branches:** work lands on `main`; the page serves the **`live`** branch
 - **Bricks loader (one-time paste):** `onboarding-loader.html`
 
-## To push an update
-1. Edit `onboarding.js` (locally, or on github.com directly, or just ask Claude).
-2. Commit it to the `main` branch.
-3. **Purge the CDN cache** so the change goes live within seconds:
-   ```
-   curl "https://purge.jsdelivr.net/gh/TKsmalls/webouts-widgets@main/onboarding.js"
-   ```
-4. Hard-refresh the page (Cmd/Ctrl+Shift+R) to confirm.
+## Why there are two branches
 
-Without the purge, jsDelivr can serve the old version for up to ~7 days.
+The loader resolves whatever `live` points at and loads that exact commit. `main`
+is where work accumulates, so a half-finished commit on `main` never reaches a
+client. Publishing is a separate, deliberate step, and it doubles as the rollback
+mechanism.
+
+## To push an update
+1. Edit `onboarding.js` and commit to `main`.
+2. Publish:
+   ```
+   git push origin main:live --force-with-lease
+   ```
+3. Reload the page. The loader picks up the new commit within seconds; no CDN
+   purge and no hard refresh, because it requests an immutable per-commit URL.
+
+## To roll back
+
+Point `live` at the last good commit. It takes effect within seconds:
+```
+git push origin <good-sha>:live --force
+```
 
 ## Notes
-- No secrets live in `onboarding.js` — it only calls the public onboarding API,
-  which is why a public repo is fine.
-- Want code-privacy + instant deploys with no purge step? Connect a **private**
-  repo to Netlify/Cloudflare Pages and point the loader at that URL instead.
-  (More setup; not needed for a client-facing form.)
+- No secrets live in `onboarding.js` — it only calls the public onboarding API.
+- The page is first-party JavaScript on webouts.com, so anything on `live` can
+  read the form. That is the reason for the publish gate: pushing to `main`
+  should never be able to change what a client is running.
+- Want code-privacy on top of this? Connect a **private** repo to
+  Netlify/Cloudflare Pages and point the loader at that URL instead.

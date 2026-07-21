@@ -1,20 +1,25 @@
 <!-- WebOuts Onboarding — ONE-TIME paste into a Bricks "Code" element on webouts.com/onboarding.
-     This bootstrap always loads the newest published version within seconds of a push:
-     it asks GitHub for the current commit, then loads that exact (immutable) file from the CDN,
-     so there is no cache lag and no hard-refresh needed. If GitHub is unreachable it falls back
-     to the @main URL. After this, the web team never touches this again. -->
+     This bootstrap loads whatever the "live" branch currently points at: it asks GitHub for that
+     branch's commit, then loads that exact (immutable) file from the CDN, so there is no cache lag
+     and no hard-refresh needed. If GitHub is unreachable it falls back to the @live URL.
+     After this, the web team never touches this again.
+
+     Why "live" and not "main": work lands on main continuously, but only a deliberate publish
+     moves the live branch, so an in-progress commit can never appear on the client-facing page.
+     Publish  = git push origin main:live --force-with-lease
+     Roll back = git push origin <good-sha>:live --force  (takes effect within seconds) -->
 <div id="wo-onboarding-root"></div>
 <script>
 (function () {
-  var repo = 'TKsmalls/webouts-widgets', file = 'onboarding.js';
+  var repo = 'TKsmalls/webouts-widgets', file = 'onboarding.js', branch = 'live';
   function inject(ref) {
     var s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/gh/' + repo + '@' + ref + '/' + file;
     document.head.appendChild(s);
   }
-  fetch('https://api.github.com/repos/' + repo + '/commits/main', { headers: { Accept: 'application/vnd.github.sha' } })
+  fetch('https://api.github.com/repos/' + repo + '/commits/' + branch, { headers: { Accept: 'application/vnd.github.sha' } })
     .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
-    .then(function (sha) { inject(/^[0-9a-f]{40}$/.test(sha.trim()) ? sha.trim() : 'main'); })
-    .catch(function () { inject('main'); });
+    .then(function (sha) { inject(/^[0-9a-f]{40}$/.test(sha.trim()) ? sha.trim() : branch); })
+    .catch(function () { inject(branch); });
 })();
 </script>
