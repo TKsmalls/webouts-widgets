@@ -807,7 +807,7 @@
       </div>
 
       <div class="sec" data-sec="samples">
-        <h2><span class="num">6</span> What your team and providers will receive</h2>
+        <h2><span class="num">6</span> Communications and reminders</h2>
         <p class="intro">Every email and text we send, so nothing is a surprise. Open a stage to see what arrives and when.</p>
         <div class="secbody">
           <div class="help">These are real templates with the names taken out. As you fill in the rest of this form, the <span class="wo-ml filled">highlighted blanks</span> fill themselves in with your details. You can also click any blank and type your own wording to see how it reads.</div>
