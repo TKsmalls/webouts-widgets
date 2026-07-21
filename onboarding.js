@@ -709,7 +709,9 @@
       <div class="sec" data-sec="brand">
         <h2><span class="num">7</span> Brand guidelines</h2>
         <div class="secbody">
-          <div class="help">Upload your brand guidelines (PDF or image, up to 10&nbsp;MB each). Add as many as you like: style guide, logo files, colors and fonts. Something larger? Email it and we’ll attach it.</div>
+          <div class="help">Your style guide, logo files, colors and fonts.</div>
+          <div class="fld"><label>Link to your brand assets</label><div class="help">Easiest for both of us, and there is no size limit. A brand portal, Google Drive or Dropbox folder, or a page on your own site all work. Please check that sharing is set so anyone with the link can view, otherwise it reaches us locked.</div><input type="text" data-key="brandGuide.link" placeholder="https://…"></div>
+          <div class="help">Or upload smaller files directly (PDF or image, up to 10&nbsp;MB each). Handy for a logo or a short guide. Anything bigger should come as a link.</div>
           ${uploadHTML('brand', 'Files attach straight to your onboarding record.')}
         </div>
       </div>
