@@ -431,7 +431,12 @@
   ];
 
   var STYLE = `
-  #wo-onb{max-width:720px;margin:0 auto;padding:8px 16px 72px;font-family:'Poppins',Arial,Helvetica,sans-serif;color:#1f2430;line-height:1.5}
+  /* Fluid rather than a fixed 720: the provider and contact tables were cramped on a
+     laptop while there was empty page either side. Scales with the viewport, capped so
+     help text never runs to an unreadable measure. */
+  /* border-box is load-bearing: with content-box the 16px side padding is added on top
+     of the 94vw cap, which overflowed the viewport sideways on a phone. */
+  #wo-onb{width:100%;max-width:min(980px,94vw);box-sizing:border-box;margin:0 auto;padding:8px 16px 72px;font-family:'Poppins',Arial,Helvetica,sans-serif;color:#1f2430;line-height:1.5}
   #wo-onb h1{color:#07378C;font-size:27px;font-weight:800;margin:6px 0 6px;letter-spacing:-.4px;text-align:center}
   #wo-onb .sub{color:#5b6472;font-size:15px;margin:0 auto 22px;max-width:60ch;text-align:center}
 
@@ -677,7 +682,7 @@
     #wo-onb .wo-cs-gchev{grid-area:chev;margin:0;align-self:center}
     #wo-onb .wo-cs-gc{grid-area:count;justify-self:start;background:none;border:0;padding:0;margin:0;font-size:12px}
     #wo-onb .wo-cs-grid{padding:12px}
-    #wo-onb .sec .due{font-size:10.5px;padding:3px 8px}
+    #wo-onb .sec .due{font-size:10px;padding:2px 7px;letter-spacing:.2px}
     #wo-onb .sec.has-due .done-label{display:none}
     /* the placeholder is an alignment aid; on a phone it would just wrap the title */
     #wo-onb .sec .due.none{display:none}
@@ -1192,7 +1197,7 @@
     h.addEventListener('keydown', function (e) { if (e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleOpen(); } });
   });
   if (secs[0]) { secs[0].classList.add('open'); secs[0].querySelector('h2').setAttribute('aria-expanded', 'true'); }
-  // Due dates are set by WebOuts on the Monday record and are read-only here.
+  // Deadlines are set by WebOuts on the Monday record and are read-only here.
   var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   function dueParts(s) {
     var p = String(s || '').split('-');
@@ -1213,12 +1218,12 @@
         var now = new Date();
         var today = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
         el.className = 'due' + ((v.y * 10000 + v.m * 100 + v.d) < today ? ' past' : '');
-        el.textContent = 'Due ' + MON[v.m - 1] + ' ' + v.d + (v.y === now.getFullYear() ? '' : ', ' + v.y);
+        el.textContent = 'Deadline ' + MON[v.m - 1] + ' ' + v.d + (v.y === now.getFullYear() ? '' : ', ' + v.y);
       } else {
         // Undated sections keep the slot rather than leaving a gap, so headers stay
         // aligned and a date appearing later does not shove the row around.
         el.className = 'due none';
-        el.textContent = 'No date set';
+        el.textContent = 'No deadline set';
       }
       h.insertBefore(el, h.querySelector('.done-toggle') || null);
       // Only a real date trims the "Completed" wording on narrow screens; the empty
