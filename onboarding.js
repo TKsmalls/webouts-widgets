@@ -481,10 +481,20 @@
   #wo-onb .sec:not(.open) h2{margin-bottom:0}
 
   /* communication samples */
-  #wo-onb .wo-cs-grp{margin:0 0 20px}
+  #wo-onb .wo-cs-grp{border:1px solid #dbe4f7;border-radius:11px;overflow:hidden;margin:0 0 12px;background:#fff}
   #wo-onb .wo-cs-grp:last-child{margin-bottom:0}
-  #wo-onb .wo-cs-grph{font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#8a93a3;margin:0 0 9px}
-  #wo-onb .wo-cs-grid{display:flex;flex-wrap:wrap;gap:10px}
+  #wo-onb .wo-cs-grph{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:14px 16px;background:#f2f6ff;border:0;border-radius:0;text-align:left;cursor:pointer;font-family:inherit;font-weight:400}
+  #wo-onb .wo-cs-grph:hover{background:#e8effc}
+  #wo-onb .wo-cs-grp.open .wo-cs-grph{border-bottom:1px solid #dbe4f7}
+  #wo-onb .wo-cs-gnum{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50%;background:#07378C;color:#fff;font-size:12.5px;font-weight:700}
+  #wo-onb .wo-cs-gtw{min-width:0;flex:1 1 auto}
+  #wo-onb .wo-cs-gt{display:block;font-size:15px;font-weight:700;color:#07378C;line-height:1.3}
+  #wo-onb .wo-cs-gw{display:block;font-size:12px;color:#5b6472;margin-top:2px}
+  #wo-onb .wo-cs-gc{flex:0 0 auto;font-size:11.5px;font-weight:700;color:#07378C;background:#fff;border:1px solid #d6e3ff;padding:4px 10px;border-radius:20px;white-space:nowrap}
+  #wo-onb .wo-cs-gchev{flex:0 0 auto;width:9px;height:9px;border-right:2px solid #07378C;border-bottom:2px solid #07378C;transform:rotate(45deg);transition:transform .2s ease;margin:-4px 2px 0 0}
+  #wo-onb .wo-cs-grp.open .wo-cs-gchev{transform:rotate(-135deg);margin-top:2px}
+  #wo-onb .wo-cs-grid{display:none;flex-wrap:wrap;gap:10px;padding:14px 16px}
+  #wo-onb .wo-cs-grp.open .wo-cs-grid{display:flex}
   #wo-onb .wo-cs-card{position:relative;flex:1 1 195px;min-width:170px;max-width:100%;box-sizing:border-box;border:1px solid #e6e9ef;border-radius:11px;background:#fff;padding:13px 14px;text-align:left;cursor:pointer;font-family:inherit;font-weight:400;font-size:14px;transition:border-color .15s,box-shadow .15s,transform .15s}
   #wo-onb .wo-cs-card:hover,#wo-onb .wo-cs-card:focus-visible{border-color:#07378C;box-shadow:0 8px 22px rgba(7,55,140,.13);transform:translateY(-1px);outline:none}
   #wo-onb .wo-cs-card>span,#wo-onb .wo-cs-tip>span{display:block}
@@ -541,6 +551,13 @@
   #wo-onb .wo-ml.filled{background:#eaf3ea;border-bottom-color:#2F8F5C;color:#1f6b41}
   #wo-onb .wo-ml:focus{outline:2px solid #07378C;outline-offset:1px;background:#fff}
   @media (max-width:520px){
+    /* stack the stage bar so the title keeps full width and the count drops below it */
+    #wo-onb .wo-cs-grph{display:grid;grid-template-columns:25px minmax(0,1fr) auto;grid-template-areas:"num text chev" "pad count count";gap:5px 11px;align-items:center;padding:13px 14px}
+    #wo-onb .wo-cs-gnum{grid-area:num}
+    #wo-onb .wo-cs-gtw{grid-area:text}
+    #wo-onb .wo-cs-gchev{grid-area:chev;margin:0;align-self:center}
+    #wo-onb .wo-cs-gc{grid-area:count;justify-self:start;background:none;border:0;padding:0;margin:0;font-size:12px}
+    #wo-onb .wo-cs-grid{padding:12px}
     #wo-onb .wo-cs-card>span.wo-cs-tip{display:none}
     #wo-onb .wo-cs-card{flex:1 1 100%}
     #wo-onb .wo-cs-ov{padding:12px 8px}
@@ -641,7 +658,7 @@
 
       <div class="sec" data-sec="samples">
         <h2><span class="num">6</span> What your team and providers will receive</h2>
-        <p class="intro">Every email and text we send, so nothing is a surprise. Hover to preview, click to read the whole thing.</p>
+        <p class="intro">Every email and text we send, so nothing is a surprise. Open a stage to see what arrives and when.</p>
         <div class="secbody">
           <div class="help">These are real templates with the names taken out. As you fill in the rest of this form, the <span class="wo-ml filled">highlighted blanks</span> fill themselves in with your details. You can also click any blank and type your own wording to see how it reads.</div>
           <div id="wo-cs-list"></div>
@@ -975,12 +992,20 @@
   }
 
   var GROUPS = [
-    { stage: 'kickoff', label: 'Kickoff and scheduling' },
-    { stage: 'script', label: 'Script review and approval' },
-    { stage: 'filming', label: 'Filming preparation' },
-    { stage: 'ongoing', label: 'Ongoing texts' },
-    { stage: 'client-sent', label: 'You send this one' }
+    { stage: 'kickoff', label: 'Kickoff and scheduling', when: 'From project launch until each provider books' },
+    { stage: 'script', label: 'Script review and approval', when: 'From the first draft until the script is approved' },
+    { stage: 'filming', label: 'Filming preparation', when: 'The two weeks before filming day' },
+    { stage: 'ongoing', label: 'Ongoing', when: 'Anytime during the project' },
+    { stage: 'client-sent', label: 'You send this one', when: 'Less than a week before filming' }
   ];
+  function countLabel(items) {
+    var e = items.filter(function (s) { return s.channel === 'email'; }).length;
+    var t = items.length - e;
+    var parts = [];
+    if (e) parts.push(e + (e === 1 ? ' email' : ' emails'));
+    if (t) parts.push(t + (t === 1 ? ' text' : ' texts'));
+    return parts.join(', ');
+  }
   function tagsHTML(s) {
     var h = '<span class="wo-cs-tag ' + (s.channel === 'sms' ? 'sms">Text' : 'email">Email') + '</span>';
     if (s.sentBy !== 'WebOuts') h += '<span class="wo-cs-tag you">You send this</span>';
@@ -1006,10 +1031,19 @@
   }
   var listEl = document.getElementById('wo-cs-list');
   function renderSamples() {
+    var n = 0;
     listEl.innerHTML = GROUPS.map(function (g) {
       var items = SAMPLES.filter(function (s) { return s.stage === g.stage; });
       if (!items.length) return '';
-      return '<div class="wo-cs-grp"><div class="wo-cs-grph">' + esc(g.label) + '</div>'
+      n++;
+      return '<div class="wo-cs-grp">'
+        + '<button type="button" class="wo-cs-grph" aria-expanded="false">'
+        + '<span class="wo-cs-gnum" aria-hidden="true">' + n + '</span>'
+        + '<span class="wo-cs-gtw"><span class="wo-cs-gt">' + esc(g.label) + '</span>'
+        + '<span class="wo-cs-gw">' + esc(g.when) + '</span></span>'
+        + '<span class="wo-cs-gc">' + countLabel(items) + '</span>'
+        + '<span class="wo-cs-gchev" aria-hidden="true"></span>'
+        + '</button>'
         + '<div class="wo-cs-grid">' + items.map(cardHTML).join('') + '</div></div>';
     }).join('');
   }
@@ -1060,7 +1094,14 @@
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   listEl.addEventListener('click', function (e) {
-    var card = e.target.closest ? e.target.closest('.wo-cs-card') : null;
+    if (!e.target.closest) return;
+    var head = e.target.closest('.wo-cs-grph');
+    if (head) { // stages open independently, so a client can compare two at once
+      var open = head.parentElement.classList.toggle('open');
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      return;
+    }
+    var card = e.target.closest('.wo-cs-card');
     if (card) openModal(card.getAttribute('data-id'));
   });
   mdClose.addEventListener('click', closeModal);
