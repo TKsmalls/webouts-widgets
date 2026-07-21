@@ -1,13 +1,7 @@
-<!-- WebOuts Onboarding — ONE-TIME paste into a Bricks "Code" element on webouts.com/onboarding.
-     This bootstrap loads whatever the "live" branch currently points at: it asks GitHub for that
-     branch's commit, then loads that exact (immutable) file from the CDN, so there is no cache lag
-     and no hard-refresh needed. If GitHub is unreachable it falls back to the @live URL.
-     After this, the web team never touches this again.
-
-     Why "live" and not "main": work lands on main continuously, but only a deliberate publish
-     moves the live branch, so an in-progress commit can never appear on the client-facing page.
-     Publish  = git push origin main:live --force-with-lease
-     Roll back = git push origin <good-sha>:live --force  (takes effect within seconds) -->
+<!-- WebOuts Onboarding — paste into the Bricks "Code" element on webouts.com/onboarding.
+     Loads the currently published version automatically; no cache lag, no hard-refresh needed.
+     Publishing is a deliberate step, so work in progress never reaches a client.
+     See HOW-TO-UPDATE-PAGE.md in TKsmalls/webouts-widgets. -->
 <div id="wo-onboarding-root"></div>
 <script>
 (function () {
