@@ -749,7 +749,7 @@
       <div class="sp-inner">
         <img class="sp-logo" src="https://webouts.com/wp-content/uploads/2022/03/WebOuts-crop-Logo.png" alt="WebOuts" width="719" height="230">
         <h1 class="sp-title">Grabbing your information</h1>
-        <p class="sp-sub" role="status" aria-live="polite">One moment. Nothing has been lost, we are just fetching everything you have saved so far.</p>
+        <p class="sp-sub" role="status" aria-live="polite">One moment while we pull up everything you have saved.</p>
         <div class="ld-bar" aria-hidden="true"><span></span></div>
       </div>
     </div>
