@@ -543,7 +543,7 @@
   #wo-onb .sp-go{background:#07378C;color:#fff;border:0;border-radius:999px;padding:12px 22px;font:600 15px/1 inherit;cursor:pointer;transition:background .2s}
   #wo-onb .sp-go:hover{background:#052a6b}
   #wo-onb .sp-err{margin-top:10px;font-size:13.5px;color:#b3411f;text-align:left}
-  #wo-onb #wo-splash-resume{margin-top:20px;animation-delay:.46s}
+  #wo-onb .sp-hint{font-size:13.5px;color:#5a6472;margin:0 0 10px}
   #wo-onb .sp-foot{margin:38px 0 0;animation-delay:.54s}
   #wo-onb .sp-foot .sp-quiet{font-size:13.5px;color:#7a8494;text-decoration-color:rgba(122,132,148,.35)}
   @media (max-width:600px){
@@ -716,16 +716,16 @@
         <p class="sp-sub sp-sub2">Work through it in any order and answer what you can. Everything saves as you type, and you’ll get a private link you can pass around your team and come back to any time.</p>
         <div class="sp-actions">
           <button type="button" class="sp-cta" id="wo-splash-new"><span>Start a new onboarding</span></button>
-          <button type="button" class="sp-quiet" id="wo-splash-have" aria-expanded="false" aria-controls="wo-splash-paste">I already have a link</button>
+          <button type="button" class="sp-quiet" id="wo-splash-have" aria-expanded="false" aria-controls="wo-splash-paste">Resume</button>
         </div>
         <div class="sp-paste" id="wo-splash-paste" hidden>
+          <p class="sp-hint">Paste the private link WebOuts sent you, or the one you saved.</p>
           <div class="sp-row">
             <input type="text" id="wo-splash-link" placeholder="Paste your private link or code" aria-label="Your private onboarding link">
             <button type="button" class="sp-go" id="wo-splash-open">Open</button>
           </div>
           <div class="sp-err" id="wo-splash-err" style="display:none"></div>
         </div>
-        <div id="wo-splash-resume" style="display:none"><button type="button" class="sp-quiet" id="wo-splash-resume-btn">Resume the onboarding you started on this device</button></div>
         <p class="sp-foot"><button type="button" class="sp-quiet" id="wo-splash-peek">Preview the form without saving anything</button></p>
       </div>
     </div>
@@ -1555,10 +1555,6 @@
   // ---- splash wiring ----
   if (!token) {
     var prior = saved('woOnbToken');
-    if (prior) {
-      document.getElementById('wo-splash-resume').style.display = '';
-      document.getElementById('wo-splash-resume-btn').addEventListener('click', function () { showForm(prior); });
-    }
     document.getElementById('wo-splash-new').addEventListener('click', function () {
       var t = newToken();
       remember('woOnbToken', t);
@@ -1568,7 +1564,13 @@
     // wall of inputs. Revealing it focuses it, so the click and the typing are one move.
     var pasteEl = document.getElementById('wo-splash-paste');
     var haveBtn = document.getElementById('wo-splash-have');
+    // One button does both jobs: if this browser already started an onboarding it picks
+    // straight up where they left off, and only when there is nothing to resume does it
+    // ask for a link. No verification round-trip on the stored token on purpose - a draft
+    // that was started but never typed into has no record yet, and checking would wrongly
+    // turn their own unfinished draft away.
     haveBtn.addEventListener('click', function () {
+      if (prior) { showForm(prior); return; }
       var open = !pasteEl.hidden;
       pasteEl.hidden = open;
       haveBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
