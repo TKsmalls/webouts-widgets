@@ -26,6 +26,10 @@
       { c: 'Specialty', ph: 'Cardiology' },
       { c: 'Email', ph: 'jane@org.com' }
     ] },
+    resources: { key: 'resources.list', cols: [
+      { c: 'What it is', ph: 'e.g. A profile video we love' },
+      { c: 'Link', ph: 'https://…' }
+    ] },
     approvals: { key: 'approval.process', cols: [
       { c: 'Name', ph: 'Full name' },
       { c: 'What they review or approve', ph: 'e.g. Reviews scripts' }
@@ -490,6 +494,8 @@
   #wo-onb .sec .done-toggle:hover .done-label{color:#2F8F5C}
   #wo-onb .sec.filled .check{background:#2F8F5C;border-color:#2F8F5C;color:#fff}
   #wo-onb .sec.filled .done-label{color:#2F8F5C}
+  #wo-onb .sec .due{flex:0 0 auto;font-size:11px;font-weight:700;letter-spacing:.3px;color:#07378C;background:#eef2fb;border:1px solid #d6e3ff;border-radius:20px;padding:3px 9px;white-space:nowrap}
+  #wo-onb .sec .due.past{color:#b3411f;background:#FDEFE9;border-color:#f3c9bb}
   #wo-onb .sec .chev{width:9px;height:9px;border-right:2px solid #9aa4b4;border-bottom:2px solid #9aa4b4;transform:rotate(-45deg);transition:transform .2s ease;flex:0 0 auto;margin-top:-3px}
   #wo-onb .sec.open .chev{transform:rotate(45deg)}
   #wo-onb .sec:not(.open) .intro,#wo-onb .sec:not(.open) .secbody{display:none}
@@ -590,6 +596,8 @@
     #wo-onb .wo-cs-gchev{grid-area:chev;margin:0;align-self:center}
     #wo-onb .wo-cs-gc{grid-area:count;justify-self:start;background:none;border:0;padding:0;margin:0;font-size:12px}
     #wo-onb .wo-cs-grid{padding:12px}
+    #wo-onb .sec .due{font-size:10.5px;padding:3px 8px}
+    #wo-onb .sec.has-due .done-label{display:none}
     #wo-onb .wo-cs-card>span.wo-cs-tip{display:none}
     #wo-onb .wo-cs-card{flex:1 1 100%}
     #wo-onb .wo-cs-ov{padding:12px 8px}
@@ -705,8 +713,18 @@
         </div>
       </div>
 
+      <div class="sec" data-sec="resources">
+        <h2><span class="num">8</span> Samples &amp; resources</h2>
+        <p class="intro">Anything else that helps us understand what you want. All optional.</p>
+        <div class="secbody">
+          <div class="help">Profile videos you like or want us to match, sound bites, b-roll, past scripts, photos, style references, anything at all. Name each one so we know what we are looking at, then paste a link. A new row appears as you go.</div>
+          <div class="help"><strong>Please share links rather than files.</strong> Most of this is video, and links sidestep upload size limits entirely. Google Drive, Dropbox, YouTube, Vimeo, or a page on your own site all work. Just check that sharing is set so anyone with the link can view.</div>
+          ${tableHTML('resources', TABLES.resources)}
+        </div>
+      </div>
+
       <div class="sec" data-sec="misc">
-        <h2><span class="num">8</span> Anything else</h2>
+        <h2><span class="num">9</span> Anything else</h2>
         <div class="secbody">
           <div class="help">Anything else we should know that didn’t fit above.</div>
           <textarea data-key="misc.notes" aria-label="Anything else"></textarea>
@@ -962,6 +980,32 @@
     h.addEventListener('keydown', function (e) { if (e.target === h && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleOpen(); } });
   });
   if (secs[0]) { secs[0].classList.add('open'); secs[0].querySelector('h2').setAttribute('aria-expanded', 'true'); }
+  // Due dates are set by WebOuts on the Monday record and are read-only here.
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function dueParts(s) {
+    var p = String(s || '').split('-');
+    if (p.length !== 3) return null;
+    var y = parseInt(p[0], 10), m = parseInt(p[1], 10), d = parseInt(p[2], 10);
+    return (y && m >= 1 && m <= 12 && d) ? { y: y, m: m, d: d } : null;
+  }
+  function applyDue(due) {
+    due = due || {};
+    secs.forEach(function (sec) {
+      var h = sec.querySelector('h2');
+      var old = h.querySelector('.due');
+      if (old) h.removeChild(old);
+      sec.classList.remove('has-due');
+      var v = dueParts(due[sec.getAttribute('data-sec')]);
+      if (!v) return;
+      var now = new Date();
+      var today = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+      var el = document.createElement('span');
+      el.className = 'due' + ((v.y * 10000 + v.m * 100 + v.d) < today ? ' past' : '');
+      el.textContent = 'Due ' + MON[v.m - 1] + ' ' + v.d + (v.y === now.getFullYear() ? '' : ', ' + v.y);
+      h.insertBefore(el, h.querySelector('.done-toggle') || null);
+      sec.classList.add('has-due'); // narrow screens drop the "Completed" wording to make room
+    });
+  }
   function applyDone(str) {
     doneSecs = {};
     String(str || '').split(',').filter(Boolean).forEach(function (slug) { doneSecs[slug] = 1; });
@@ -1265,6 +1309,7 @@
     gfxUp.load(data['graphics.files']);
     brandUp.load(data['brandGuide.files']);
     applyDone(data._done);
+    applyDue(res && res.due);
     lockIfNeeded(data._stage);
     var has = Object.keys(data).length > 0;
     loaded = true;
