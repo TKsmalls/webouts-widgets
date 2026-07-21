@@ -25,11 +25,24 @@
     providers: { key: 'providers.launchList', cols: [
       { c: 'Provider name', ph: 'Dr. Jane Smith' },
       { c: 'Specialty', ph: 'Cardiology' },
-      { c: 'Email', ph: 'jane@org.com' }
+      { c: 'Email', ph: 'jane@org.com' },
+      // Added after the Northwell schedule asked for "names, specialties, emails
+      // and profile links". Rows saved with three values simply leave this blank.
+      { c: 'Profile link', ph: 'https://…' }
+    ] },
+    filmdates: { key: 'filming.preferredDates', cols: [
+      { c: 'Preferred date', ph: 'Tue, Oct 28' },
+      { c: 'Notes (optional)', ph: 'Morning only' }
     ] },
     resources: { key: 'resources.list', cols: [
       { c: 'What it is', ph: 'e.g. A profile video we love' },
       { c: 'Link', ph: 'https://…' }
+    ] },
+    billing: { key: 'billing.contacts', cols: [
+      { c: 'Name', ph: 'Full name' },
+      { c: 'Title / role', ph: 'Accounts Payable' },
+      { c: 'Email', ph: 'ap@org.com' },
+      { c: 'Phone', ph: '(555) 555-5555' }
     ] },
     approvals: { key: 'approval.process', cols: [
       { c: 'Name', ph: 'Full name' },
@@ -671,8 +684,8 @@
           <div class="pastebox">
             <button type="button" class="pastetoggle pasteui" id="wo-prov-paste-toggle">Paste from a spreadsheet</button>
             <div class="pastewrap" id="wo-prov-paste" style="display:none">
-              <div class="help">Copy the name, specialty, and email columns from Excel or Google Sheets, then paste below. One provider per line — we’ll fill in the rows for you.</div>
-              <textarea class="pasteui" id="wo-prov-paste-txt" placeholder="Dr. Jane Smith, Cardiology, jane@org.com"></textarea>
+              <div class="help">Copy the name, specialty, email, and profile link columns from Excel or Google Sheets, then paste below. One provider per line — we’ll fill in the rows for you. Missing a column? Paste what you have.</div>
+              <textarea class="pasteui" id="wo-prov-paste-txt" placeholder="Dr. Jane Smith, Cardiology, jane@org.com, https://…"></textarea>
               <button type="button" class="pasteadd pasteui" id="wo-prov-paste-add">Add to table</button>
             </div>
           </div>
@@ -683,6 +696,8 @@
         <h2><span class="num">4</span> Filming logistics</h2>
         <div class="secbody">
           <div class="fld"><label>Filming address</label><div class="help">Where should our crew come to film?</div><input type="text" data-key="filming.location"></div>
+          <div class="fld"><label>Preferred filming dates</label><div class="help"><strong>We film 8 profiles a day.</strong> So two days covers 16 providers, three days covers 24, and a full week covers 40. List the dates that work for you, best first, and we’ll hold them. Nothing is locked in until we confirm the dates back to you.</div>${tableHTML('filmdates', TABLES.filmdates)}</div>
+          <div class="fld"><label>Total appointment slots</label><div class="help">How many providers you’d like to film in total across those dates. Leave it blank if you’d rather we work it out from the dates above.</div><input type="text" data-key="filming.slots" placeholder="16"></div>
           <div class="fld"><label>Anything our crew should know?</label><div class="help">On-site contact, parking or building access, the room we’ll film in, best days and times.</div><textarea data-key="production.details"></textarea></div>
         </div>
       </div>
@@ -693,6 +708,8 @@
         <div class="secbody">
           <div class="fld"><label>Graphics</label><div class="help">The on-screen graphics for your videos, like lower-thirds and title cards. If you have editable <strong>Adobe or DaVinci Resolve</strong> project files, upload them below and we’ll use those files directly. If not, we’ll design a set from your brand guidelines.</div>${uploadHTML('gfx', 'Upload your Adobe or DaVinci Resolve project files. Something larger? Email it and we’ll add it.')}</div>
           <div class="fld"><label>Scripting</label><div class="help">Tone and voice, any must-say or never-say, reading level, and legal or compliance notes.</div><textarea data-key="scripting.standards"></textarea></div>
+          <div class="fld"><label>Interview questions and preferred sound bites</label><div class="help">Questions you’d like us to ask in the script interview, and any sound bites you want to be sure we capture. Paste your own list if you have one. If you leave this blank we’ll use our standard interview guide.</div><textarea data-key="scripting.interviewQuestions"></textarea></div>
+          <div class="fld"><label>Approved images for green-screen backgrounds</label><div class="help">A folder link to approved architectural images we can use behind your providers. Building exteriors, lobbies, and interiors all work well. Please check that sharing is set so anyone with the link can view.</div><input type="text" data-key="look.backgroundImages" placeholder="https://…"></div>
           <div class="fld"><label>SEO</label><div class="help">If you follow an SEO formula for titles, descriptions or file names, paste it here, or drop in a couple of real examples from past videos. We’ll build off your exact pattern.</div><textarea data-key="seo.standards" placeholder="e.g. [Provider Name], [Specialty] | [Organization] — [City, State]"></textarea></div>
         </div>
       </div>
@@ -726,8 +743,19 @@
         </div>
       </div>
 
+      <div class="sec" data-sec="billing">
+        <h2><span class="num">9</span> Billing</h2>
+        <p class="intro">So invoices reach the right desk the first time.</p>
+        <div class="secbody">
+          <div class="fld"><label>Billing contact(s)</label><div class="help">Who should receive invoices. Add accounts payable as well as your own contact if that helps.</div>${tableHTML('billing', TABLES.billing)}</div>
+          <div class="fld"><label>Purchase order or reference number</label><div class="help">If your organization requires one on the invoice, put it here.</div><input type="text" data-key="billing.po"></div>
+          <div class="fld"><label>Is an updated invoice required?</label><div class="help">Tell us if anything on our current invoice needs to change, for example a different entity name, address, PO number, or cost center.</div><textarea data-key="billing.updatedInvoice"></textarea></div>
+          <div class="fld"><label>How should we send invoices?</label><div class="help">Email, a billing portal, or anything else we should follow. Include payment terms if you have set ones.</div><textarea data-key="billing.instructions"></textarea></div>
+        </div>
+      </div>
+
       <div class="sec" data-sec="misc">
-        <h2><span class="num">9</span> Anything else</h2>
+        <h2><span class="num">10</span> Anything else</h2>
         <div class="secbody">
           <div class="help">Anything else we should know that didn’t fit above.</div>
           <textarea data-key="misc.notes" aria-label="Anything else"></textarea>
