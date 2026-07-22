@@ -504,7 +504,9 @@
 
   /* buttons + states */
   #wo-onb button{font-family:inherit;font-weight:700;font-size:14px;border:0;border-radius:9px;padding:10px 18px;cursor:pointer}
-  #wo-onb .submit{background:#E26337;color:#fff;font-size:16px;padding:16px 22px;width:100%;margin-top:10px}
+  /* asymmetric top/bottom padding optically centres the label: it has no descenders,
+     so a geometrically-centred box reads top-heavy. 18/14 nudges the ink down ~2px. */
+  #wo-onb .submit{background:#E26337;color:#fff;font-size:16px;padding:18px 22px 14px;width:100%;margin-top:10px}
   #wo-onb .submit:hover{filter:brightness(1.05)}
   /* greyed until the essentials are in — kept clickable (not disabled) so the hover
      title still fires and a click can scroll them to the first missing section. */
