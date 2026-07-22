@@ -452,6 +452,12 @@
   #wo-onb .linkbox{font-size:12.5px;color:#07378C;background:#f2f6ff;border:1px solid #d6e3ff;border-radius:7px;padding:7px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #wo-onb .copy{background:#07378C;color:#fff;flex:0 0 auto}
   #wo-onb .copy:hover{filter:brightness(1.1)}
+  /* progress lives on its own full-width row inside the sticky bar (flex-basis 100%),
+     so it never fights the link box for space and stays visible while scrolling. */
+  #wo-onb .prog{flex:1 1 100%;display:flex;align-items:center;gap:10px;margin-top:2px}
+  #wo-onb .progtrack{flex:1;height:6px;background:#eef2f8;border-radius:99px;overflow:hidden}
+  #wo-onb .progfill{display:block;height:100%;width:0;background:#2F8F5C;border-radius:99px;transition:width .3s ease}
+  #wo-onb .progtxt{font-size:12px;font-weight:600;color:#4b5563;white-space:nowrap}
 
   /* sections */
   #wo-onb .sec{border:1px solid #e6e9ef;border-radius:12px;padding:20px 22px;margin:0 0 14px;background:#fff}
@@ -500,6 +506,10 @@
   #wo-onb button{font-family:inherit;font-weight:700;font-size:14px;border:0;border-radius:9px;padding:10px 18px;cursor:pointer}
   #wo-onb .submit{background:#E26337;color:#fff;font-size:16px;padding:16px 22px;width:100%;margin-top:10px}
   #wo-onb .submit:hover{filter:brightness(1.05)}
+  /* greyed until the essentials are in — kept clickable (not disabled) so the hover
+     title still fires and a click can scroll them to the first missing section. */
+  #wo-onb .submit.needs{background:#cfd6e0;cursor:not-allowed}
+  #wo-onb .submit.needs:hover{filter:none}
   /* ---- splash: shown only when the URL carries no ?c=, so an emailed link never sees it ----
      Everything animates on entrance with pure CSS delays; there is no JS timeline to
      fall out of sync, and prefers-reduced-motion turns the movement off wholesale. */
@@ -549,6 +559,10 @@
   #wo-onb .sp-go:hover{background:#052a6b}
   #wo-onb .sp-err{margin-top:10px;font-size:13.5px;color:#b3411f;text-align:left}
   #wo-onb .sp-hint{font-size:13.5px;color:#5a6472;margin:0 0 10px}
+  #wo-onb .sp-need{max-width:440px;margin:30px auto 0;text-align:left;background:#f7f9fd;border:1px solid #e6ecf6;border-radius:14px;padding:16px 20px;animation-delay:.46s}
+  #wo-onb .sp-needlead{font-size:13.5px;line-height:1.55;color:#07378C;font-weight:600;margin:0 0 10px}
+  #wo-onb .sp-needttl{font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#8a93a3;margin:0 0 8px}
+  #wo-onb .sp-needlist{margin:0;padding:0 0 0 18px;color:#5a6472;font-size:13.5px;line-height:1.7}
   #wo-onb .sp-foot{margin:38px 0 0;animation-delay:.54s}
   #wo-onb .sp-foot .sp-quiet{font-size:13.5px;color:#7a8494;text-decoration-color:rgba(122,132,148,.35)}
   @media (max-width:600px){
@@ -732,6 +746,16 @@
           </div>
           <div class="sp-err" id="wo-splash-err" style="display:none"></div>
         </div>
+        <div class="sp-need">
+          <p class="sp-needlead">No need to gather everything first. Start now and fill the rest in over time, from any device, using your saved link.</p>
+          <p class="sp-needttl">When you’re ready, it helps to have these on hand:</p>
+          <ul class="sp-needlist">
+            <li>Your provider list, with names, specialties and emails</li>
+            <li>A link to your brand assets: logo, colors and fonts</li>
+            <li>Your preferred filming dates</li>
+            <li>A billing contact</li>
+          </ul>
+        </div>
         <p class="sp-foot"><button type="button" class="sp-quiet" id="wo-splash-peek">Preview the form without saving anything</button></p>
       </div>
     </div>
@@ -752,11 +776,15 @@
         <span class="linkbox" id="wo-link"></span>
       </div>
       <button type="button" class="copy" id="wo-copy">Copy link</button>
+      <div class="prog" id="wo-prog" title="How many sections your team has marked Completed.">
+        <span class="progtrack"><span class="progfill" id="wo-progfill"></span></span>
+        <span class="progtxt" id="wo-progtxt">0 of 10 sections done</span>
+      </div>
     </div>
     <div id="wo-lockmsg" class="locked" style="display:none">This form has been locked by the WebOuts team and is now read-only. Contact us if something needs to change.</div>
 
     <h1 id="wo-welcome">Welcome! Let’s set up your profile videos</h1>
-    <p class="sub" id="wo-welcomesub">This is how we get ready to film your providers. It takes about 10 minutes, and you don’t need every answer today. This works best as a team effort: copy your private link above and pass it around so the right person fills in each section. Everything saves as you go, so anyone can stop and pick up later.</p>
+    <p class="sub" id="wo-welcomesub">This is how we get ready to film your providers. Most sections take a couple of minutes, and a few, like your provider list, you may want to gather first. You don’t need every answer today. This works best as a team effort: copy your private link above and pass it around so the right person fills in each section. Everything saves as you go, so anyone can stop and pick up later.</p>
 
     <div id="wo-form">
       <div class="sec" data-sec="org">
@@ -1201,7 +1229,7 @@
     h.setAttribute('role', 'button');
     h.setAttribute('tabindex', '0');
     h.setAttribute('aria-expanded', 'false');
-    h.insertAdjacentHTML('beforeend', '<span class="done-toggle" role="checkbox" tabindex="0" aria-checked="false" aria-label="Mark this section completed"><span class="check" aria-hidden="true">✓</span><span class="done-label">Completed</span></span><span class="chev" aria-hidden="true"></span>');
+    h.insertAdjacentHTML('beforeend', '<span class="done-toggle" role="checkbox" tabindex="0" aria-checked="false" aria-label="Mark this section completed" title="This Completed checkbox lets your team know this task is done. WebOuts will not check it for you."><span class="check" aria-hidden="true">✓</span><span class="done-label">Completed</span></span><span class="chev" aria-hidden="true"></span>');
     var toggle = h.querySelector('.done-toggle');
     function toggleDone() {
       if (locked) return;
@@ -1210,6 +1238,7 @@
       if (on) doneSecs[slug] = 1; else delete doneSecs[slug];
       toggle.setAttribute('aria-checked', on ? 'true' : 'false');
       doSave({ _done: Object.keys(doneSecs).join(',') });
+      updateProgress();
     }
     toggle.addEventListener('click', function (e) { e.stopPropagation(); toggleDone(); });
     toggle.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleDone(); } });
@@ -1248,11 +1277,13 @@
         // Within a week red, within a fortnight amber, further out blue.
         el.className = 'due' + (days < 0 ? ' past' : days <= 7 ? ' soon' : days <= 14 ? ' warn' : '');
         el.textContent = 'Deadline ' + MON[v.m - 1] + ' ' + v.d + (v.y === now.getFullYear() ? '' : ', ' + v.y);
+        el.title = 'WebOuts sets this deadline. You don’t need to.';
       } else {
         // Undated sections keep the slot rather than leaving a gap, so headers stay
         // aligned and a date appearing later does not shove the row around.
         el.className = 'due none';
         el.textContent = 'No deadline set';
+        el.title = 'WebOuts will set this date.';
       }
       h.insertBefore(el, h.querySelector('.done-toggle') || null);
       // Only a real date trims the "Completed" wording on narrow screens; the empty
@@ -1293,6 +1324,7 @@
       sec.classList.toggle('filled', on);
       var t = sec.querySelector('.done-toggle'); if (t) t.setAttribute('aria-checked', on ? 'true' : 'false');
     });
+    updateProgress();
   }
 
   // ---- communication samples (read-only previews with fill-in-the-blank tokens) ----
@@ -1489,7 +1521,7 @@
       repaintTokens(t);
       return;
     }
-    if (t && (t.getAttribute && t.getAttribute('data-key') || (t.closest && t.closest('.sstab')))) repaintTokens();
+    if (t && (t.getAttribute && t.getAttribute('data-key') || (t.closest && t.closest('.sstab')))) { repaintTokens(); updateSubmit(); }
   });
   root.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && e.target && e.target.getAttribute && e.target.getAttribute('data-token')) {
@@ -1541,8 +1573,70 @@
     var b = this; setTimeout(function () { b.textContent = 'Copy link'; }, 2000);
   });
 
+  // ---- submit gate: the few fields the provisioning engine cannot start without,
+  // plus the practical minimum to actually run a shoot (a contact, providers, where
+  // and when). Everything else stays optional, matching what provision.py consumes. ----
+  var REQS = [
+    { key: 'identity.displayName', label: 'Organization name', sec: 'org' },
+    { key: 'identity.emailDomains', label: 'Provider email domain(s)', sec: 'org' },
+    { key: 'contacts.list', cols: [0, 2], label: 'At least one main contact, with a name and email', sec: 'people' },
+    { key: 'providers.launchList', cols: [0], label: 'At least one provider to feature', sec: 'providers' },
+    { key: 'filming.location', label: 'A filming address', sec: 'filming' },
+    { key: 'filming.preferredDates', cols: [0], label: 'At least one preferred filming date', sec: 'filming' }
+  ];
+  function reqMet(r) {
+    var raw = fval(r.key);
+    if (!r.cols) return !!raw;
+    // table fields serialize as "col | col | col" per line; a req is met when one
+    // line has all its named columns filled (e.g. a contact with both name and email).
+    return String(raw || '').split('\n').some(function (line) {
+      var parts = line.split(' | ');
+      return r.cols.every(function (c) { return (parts[c] || '').trim(); });
+    });
+  }
+  function missingReqs() { return REQS.filter(function (r) { return !reqMet(r); }); }
+  function updateSubmit() {
+    var btn = document.getElementById('wo-submit');
+    if (!btn || preview || locked) return; // preview/lock own the button's state
+    var miss = missingReqs();
+    if (miss.length) {
+      btn.classList.add('needs');
+      btn.title = 'A few essentials are still needed before you can submit:\n• ' +
+        miss.map(function (m) { return m.label; }).join('\n• ');
+    } else {
+      btn.classList.remove('needs');
+      btn.title = '';
+    }
+  }
+  function updateProgress() {
+    var total = secs.length;
+    var done = secs.filter(function (s) { return s.classList.contains('filled'); }).length;
+    var fill = document.getElementById('wo-progfill');
+    var txt = document.getElementById('wo-progtxt');
+    if (fill) fill.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
+    if (txt) txt.textContent = done + ' of ' + total + ' sections done';
+  }
+
   document.getElementById('wo-submit').addEventListener('click', function () {
-    if (!confirm('Submit your onboarding info for review? You can still make changes until the WebOuts team locks it in.')) return;
+    var miss = missingReqs();
+    if (miss.length) {
+      // Greyed state: reassert the hover hint and take them to the first gap.
+      updateSubmit();
+      var target = root.querySelector('#wo-form .sec[data-sec="' + miss[0].sec + '"]');
+      if (target) {
+        secs.forEach(function (s) { s.classList.remove('open'); s.querySelector('h2').setAttribute('aria-expanded', 'false'); });
+        target.classList.add('open');
+        target.querySelector('h2').setAttribute('aria-expanded', 'true');
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+    var total = secs.length;
+    var done = secs.filter(function (s) { return s.classList.contains('filled'); }).length;
+    // Confirm only when sections are still unchecked — a fully-ticked form is a
+    // deliberate submit and goes straight through.
+    if (done < total &&
+        !confirm('Only ' + done + ' of ' + total + ' sections are marked Completed. You can still submit now and keep editing until WebOuts locks it in. Submit for review anyway?')) return;
     doSave({ _stage: 'Submitted for Review' });
     document.getElementById('wo-form').style.display = 'none';
     document.getElementById('wo-done').style.display = 'block';
@@ -1578,6 +1672,8 @@
     applyDone(data._done);
     applyDue(res && res.due);
     reorderByDue(res && res.due);
+    updateProgress();
+    updateSubmit();
     // Read the real Monday Stage, not the copy in the blob. The blob only ever held
     // 'Submitted for Review', so a staff lock never actually reached the client.
     lockIfNeeded(res.stage || data._stage);
@@ -1674,6 +1770,7 @@
       applyDue({}); // preview never loads, so draw the empty date slots itself
       var sub = document.getElementById('wo-submit');
       if (sub) { sub.disabled = true; sub.textContent = 'Submitting is off in preview'; }
+      updateProgress();
       loaded = true;
       setSave('idle', 'Preview — nothing is saved');
     });
